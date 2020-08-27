@@ -6,7 +6,7 @@
 /*   By: miphigen <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/16 00:53:17 by miphigen          #+#    #+#             */
-/*   Updated: 2020/08/25 19:20:34 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/08/27 19:05:57 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,18 +27,19 @@ int main(int ac, char **av)
 	if ((map = ft_calloc(sizeof(t_map), 1)) == NULL)
 		return (0); //malloc error
 	struct_init(map);
-	parse_map(map, open("mapcub", O_RDONLY));
+	parse_map(map, open("map.cub", O_RDONLY));
 	
 	char **array = map->maze;
 	int i = 0;
 	if (map->status == 2)
 		puts("map is valid");
-	while (array != NULL && *array != NULL)
-		printf("%2d : %s\n", i++, *array++);
-	if (map->status == 2)
-	{
-		//код если карта правильная
-	}
+	else
+		puts("map is NOT valid");
+	printf("map status = %d\n", map->status);
+//	while (array != NULL && *array != NULL)
+//		printf("%2d : %s\n", i++, *array++);
+//	if (map->status == 2)
+		render_map(map);
 	//print error
 //	free_map(map);
 }

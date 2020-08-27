@@ -6,7 +6,7 @@
 /*   By: miphigen <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/16 00:30:20 by miphigen          #+#    #+#             */
-/*   Updated: 2020/08/25 19:18:46 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/08/27 19:36:06 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,14 @@
 # define CUB3D_H
 # include <fcntl.h>
 # include "libft.h"
-# include <stdio.h>//
+# include "my_mlx.h"
+
+typedef struct	s_hero
+{
+	int			x;
+	int			y;
+	char		orient;
+}				t_hero;
 
 typedef struct	s_map_info
 {
@@ -28,18 +35,18 @@ typedef struct	s_map_info
 	char		*path_S;
 	int			ceil;
 	int			floor;
-	char		*temp_s;
 
 	char		**maze;
 	int			maze_width;
 	int			maze_height;
-	int			hero_x;
-	int			hero_y;
+	t_hero		hero;
 }				t_map;
 
 void	 		parse_map(t_map *map, int fd);
 void			parse_maze(t_map *map, int fd, char *str);
 int				maze_is_valid(t_map *map);
+
+void			render_map(t_map *map);
 
 void			print_info(t_map *map);//
 void			print_2d(char *s, char **array);//

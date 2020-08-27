@@ -6,7 +6,7 @@
 /*   By: miphigen <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/21 16:24:19 by miphigen          #+#    #+#             */
-/*   Updated: 2020/08/25 17:19:27 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/08/27 19:36:05 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,11 +32,10 @@ char	*add_spaces_2_str(char *s1, int length)
 	char	*s2;
 	int		i;
 	char	*temp;
-
+	
 	if (!(s2 = malloc(length + 1)))
 		return (NULL);
 	i = 0;
-	s2[i++] = ' ';
 	if (s1)
 		temp = s1;
 		while (*temp != '\0')
@@ -60,7 +59,6 @@ char	**add_spaces(char **array, int width, int *height)
 
 	while (array[*height])//get maze height
 		(*height)++;
-	*height = *height + 2;
 	if (!(maze = malloc(sizeof(char *) * (*height + 1))))
 		return (NULL);
 	i = -1;
@@ -70,21 +68,18 @@ char	**add_spaces(char **array, int width, int *height)
 		if (!(tmp = add_spaces_2_str(array[i], width)))
 			return (NULL);
 		else
-			maze[i + 1] = tmp;
+			maze[i] = tmp;
 	}
-	if (!(maze[0] = add_spaces_2_str(NULL, width)))//занулить первую и последнюю строки
-		return (NULL);
-	if (!(maze[i + 1] = add_spaces_2_str(NULL, width)))
-		return (NULL);
-	maze[i + 2] = NULL;
+	maze[i] = NULL;
 	free(array);
 	return (maze);
 }
 
 void	set_hero(t_map *map, char c, int x, int y)
 {
-	map->hero_x = x;
-	map->hero_y = y;
+	map->hero.x = x;
+	map->hero.y = y;
+	map->hero.orient = c;
 }
 
 int		is_valid_hor(char **array, t_map *map)
@@ -139,8 +134,7 @@ int		is_valid_vert(char **array1, t_map *map, char hero_char)
 	{
 		j = 0;
 		while (j < map->maze_height - 1 && ret_value == 2)
-		{
-			
+		{	
 			c1 = array[j][i];
 			c2 = array[++j][i];
 			if (c1 == '1')
@@ -165,7 +159,7 @@ int	maze_is_valid(t_map *map)
 	if (!(map->maze = add_spaces(map->maze, map->maze_width, &map->maze_height)))
 		return (-1);
 	if ((ret_value = is_valid_hor(map->maze, map)) == 1)
-		return (is_valid_vert(map->maze, map, map->maze[map->hero_x][map->hero_y]));
+		return (is_valid_vert(map->maze, map, map->hero.orient));
 	else
 		return (-1);
 }
