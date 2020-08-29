@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   c3_is_valid.c                                      :+:      :+:    :+:   */
+/*   is_valid_c3.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: miphigen <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/21 16:24:19 by miphigen          #+#    #+#             */
-/*   Updated: 2020/08/27 19:36:05 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/08/29 19:25:38 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,13 @@ void	set_hero(t_map *map, char c, int x, int y)
 	map->hero.orient = c;
 }
 
+int		check_line(char *s)
+{
+	while (*s != '\0' && (*s == '1' || *s == ' '))
+		s++;
+	return (*s == '\0' ? 1 : 0);
+}
+
 int		is_valid_hor(char **array, t_map *map)
 {
 	int		ret_value;
@@ -92,7 +99,8 @@ int		is_valid_hor(char **array, t_map *map)
 
 	set = "012 NSWE";
 	ret_value = 1;
-	i = 0;
+	s = array[0];
+	i = 1;
 	while (array[i] && ret_value > 0)
 	{
 		s = array[i];
@@ -102,13 +110,13 @@ int		is_valid_hor(char **array, t_map *map)
 			if (*s == '1')
 				;
 			else if (*s == '0' || *s == '2')
-				ret_value = (c == ' ' || c == '\0') ? -1 : 1;
+				ret_value = (c == ' ' || c == '\0') ? 0 : 1;
 			else if (*s == ' ')
-				ret_value = c != ' ' && c != '1' && c != '\0' ? -3 : 1;
+				ret_value = c != ' ' && c != '1' && c != '\0' ? 0 : 1;
 			else
 			{
 				if (c != '1' && c != '0' && c != '2')
-					ret_value = -4;
+					ret_value = 0;
 				set_hero(map, *s, i, s - array[i]);
 				set = "012 ";
 			}
@@ -116,7 +124,8 @@ int		is_valid_hor(char **array, t_map *map)
 		}
 		i++;
 	}
-	return (ret_value);
+	ret_value = ret_value == map->hero.orient == 0 ? 0 : ret_value;
+	return (ret_value && check_line(array[i - 1] && check_line(array[0])));
 }
 
 int		is_valid_vert(char **array1, t_map *map, char hero_char)
@@ -130,6 +139,9 @@ int		is_valid_vert(char **array1, t_map *map, char hero_char)
 	char **array = map->maze;
 	ret_value = 2;
 	i = 0;
+	while (i < map->maze_height && (array[i][0] == ' ' || array[i][0] == '1'))
+		i++;
+	ret_value = i == map->maze_height ? 2 : 1;
 	while (i < map->maze_width && ret_value == 2)
 	{
 		j = 0;
