@@ -6,7 +6,7 @@
 /*   By: miphigen <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/21 16:24:19 by miphigen          #+#    #+#             */
-/*   Updated: 2020/08/29 19:25:38 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/09/01 16:52:50 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,9 +77,9 @@ char	**add_spaces(char **array, int width, int *height)
 
 void	set_hero(t_map *map, char c, int x, int y)
 {
-	map->hero.x = x;
-	map->hero.y = y;
-	map->hero.orient = c;
+	map->hero_x = y;
+	map->hero_y = x;
+	map->hero_c = c;
 }
 
 int		check_line(char *s)
@@ -110,25 +110,26 @@ int		is_valid_hor(char **array, t_map *map)
 			if (*s == '1')
 				;
 			else if (*s == '0' || *s == '2')
-				ret_value = (c == ' ' || c == '\0') ? 0 : 1;
+				ret_value = (c == ' ' || c == '\0') ? -1 : 1;
 			else if (*s == ' ')
-				ret_value = c != ' ' && c != '1' && c != '\0' ? 0 : 1;
+				ret_value = c != ' ' && c != '1' && c != '\0' ? -2 : 1;
 			else
 			{
 				if (c != '1' && c != '0' && c != '2')
-					ret_value = 0;
+					ret_value = -3;
 				set_hero(map, *s, i, s - array[i]);
 				set = "012 ";
+				*s = '0';
 			}
 			s++;
 		}
 		i++;
 	}
-	ret_value = ret_value == map->hero.orient == 0 ? 0 : ret_value;
-	return (ret_value && check_line(array[i - 1] && check_line(array[0])));
+	ret_value = map->hero_c == 0 ? 0 : ret_value;
+	return (ret_value & (check_line(array[i - 1]) & (check_line(array[0]))));
 }
 
-int		is_valid_vert(char **array1, t_map *map, char hero_char)
+int		is_valid_vert(char **array1, t_map *map)
 {
 	int		ret_value;
 	int		i;
@@ -151,7 +152,7 @@ int		is_valid_vert(char **array1, t_map *map, char hero_char)
 			c2 = array[++j][i];
 			if (c1 == '1')
 				;
-			else if (c1 == '0' || c1 == '2' || c1 == hero_char)
+			else if (c1 == '0' || c1 == '2')
 				ret_value = (c2 == ' ' || c2 == '\0') ? -5 : 2;
 			else if (c1 == ' ')
 				ret_value = c2 != ' ' && c2 != '1' && c2 != '\0' ? -6 : 2;
@@ -167,11 +168,11 @@ int	maze_is_valid(t_map *map)
 {
 	int ret_value;;
 
-	map->maze_width = get_max_width(map->maze) + 1;
+	map->maze_width = get_max_width(map->maze);
 	if (!(map->maze = add_spaces(map->maze, map->maze_width, &map->maze_height)))
 		return (-1);
-	if ((ret_value = is_valid_hor(map->maze, map)) == 1)
-		return (is_valid_vert(map->maze, map, map->hero.orient));
+	if ((map->status = is_valid_hor(map->maze, map)) == 1)
+		return (is_valid_vert(map->maze, map));
 	else
 		return (-1);
 }
