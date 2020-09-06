@@ -6,7 +6,7 @@
 /*   By: miphigen <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/16 00:30:20 by miphigen          #+#    #+#             */
-/*   Updated: 2020/08/27 19:36:06 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/09/01 16:20:06 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,13 +15,6 @@
 # include <fcntl.h>
 # include "libft.h"
 # include "my_mlx.h"
-
-typedef struct	s_hero
-{
-	int			x;
-	int			y;
-	char		orient;
-}				t_hero;
 
 typedef struct	s_map_info
 {
@@ -39,14 +32,20 @@ typedef struct	s_map_info
 	char		**maze;
 	int			maze_width;
 	int			maze_height;
-	t_hero		hero;
+
+	int			hero_x;
+	int			hero_y;
+	char		hero_c;
+
+	int			side_length;
+	t_img		img;
 }				t_map;
 
 void	 		parse_map(t_map *map, int fd);
 void			parse_maze(t_map *map, int fd, char *str);
 int				maze_is_valid(t_map *map);
-
 void			render_map(t_map *map);
+void			draw_map_2d(t_img *img, t_map *map, int side_length);
 
 void			print_info(t_map *map);//
 void			print_2d(char *s, char **array);//
