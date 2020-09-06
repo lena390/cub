@@ -6,14 +6,15 @@
 /*   By: miphigen <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/07 20:03:33 by miphigen          #+#    #+#             */
-/*   Updated: 2020/08/27 17:31:51 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/08/29 19:21:29 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MY_MLX_H
 # define MY_MLX_H
 
-# include <mlx.h>
+//# include <mlx.h>
+# include "mlx.h"
 # include <stdio.h>
 # include <math.h>
 
