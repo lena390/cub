@@ -6,7 +6,7 @@
 /*   By: miphigen <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/31 19:18:01 by miphigen          #+#    #+#             */
-/*   Updated: 2020/09/09 20:44:44 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/09/09 21:45:16 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,33 +28,47 @@ void	draw_012(t_img *img, int x, int y, int scale, int color)
 	}
 }
 
-void	draw_rays(t_img *img, int x, int y, t_map *map)
+void	draw_ray(t_img *img, int x, int y, int degr)
 {
 	double	tg;
 	int		x0;
 	int		y0;
 
-	tg = tan(map->hero_degr / (180.0 / M_PI));
+	tg = tan(degr / (180.0 / M_PI));
 	int i = -1;
 	while (++i < 50)
 	{
 		x0 = i;
 		y0 = floor(fabs(x0 * tg));
 		
-		if (map->hero_degr == 0 || map->hero_degr == 180)
+		if (degr == 0 || degr == 180)
 			y0 = 0;
-		else if (map->hero_degr == 90 || map->hero_degr == 270)
+		else if (degr == 90 || degr == 270)
 		{	
 			x0 = 0;
-			y0 = map->hero_degr == 270 ? i : -i;
+			y0 = degr == 270 ? i : -i;
 		}
-		else if (map->hero_degr > 0 && map->hero_degr < 180)
+		else if (degr > 0 && degr < 180)
 			y0 = -y0;
-		if (map->hero_degr > 90 && map->hero_degr < 270)
+		if (degr > 90 && degr < 270)
 			x0 = -x0;
-		
-		img_pixel_put(img, x + x0, y + y0 , 0);
-		printf("%d %d\n", x0, y0);
+		if (y + y0 <= img->height && y + y0 >= 0)
+			img_pixel_put(img, x + x0, y + y0 , 0);
+	}
+}
+
+void	draw_rays(t_img *img, t_map *map)
+{
+	int d_min;
+	int	d_max;
+
+	d_min = map->hero_degr - 45;
+	d_max = map->hero_degr + 45;
+	
+	printf("min/max = %d/%d\n\n", d_min, d_max);
+	while (++d_min < d_max)
+	{
+		draw_ray(img, map->hero_x, map->hero_y, d_min);
 	}
 }
 
@@ -74,7 +88,6 @@ void	draw_hero(t_img *img, int x, int y)
 		}
 	}
 }
-
 void	draw_map_2d(t_img *img, t_map *map, int scale)
 {
 	int		i;
@@ -101,5 +114,6 @@ void	draw_map_2d(t_img *img, t_map *map, int scale)
 	}
 	printf("map->hero_degr %d\n", map->hero_degr);
 	draw_hero(img, map->hero_x, map->hero_y);
-	draw_rays(img, map->hero_x, map->hero_y, map);
+	draw_rays(img, map);
+//	draw_ray(img, map->hero_x, map->hero_y, mapi->hero_degr);
 }
