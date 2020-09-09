@@ -6,7 +6,7 @@
 /*   By: miphigen <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/25 19:32:00 by miphigen          #+#    #+#             */
-/*   Updated: 2020/09/08 22:04:47 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/09/09 20:41:54 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,8 @@ int	move_hero(int key, t_map *map)
 		map->hero_degr -= 15;
 	else
 		return (0);
+//	map->hero_degr >= 720 ? map->hero_degr %= 720 : 0;
+//	map->hero_degr < 360 ? map->hero_degr += 360 : 0;
 	map->hero_degr >= 360 ? map->hero_degr %= 360 : 0;
 	map->hero_degr < 0 ? map->hero_degr += 360 : 0;
 	draw_map_2d(&map->img, map, map->scale);
