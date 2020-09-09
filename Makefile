@@ -1,5 +1,7 @@
 all:
 	gcc *c3.c ~/libft.a -lmlx -framework OpenGL -framework AppKit && ./a.out
 
-linux:
-	gcc *c3.c ~/Documents/42/libft.a -lmlx -lXext -lX11 && ./a.out
+l-with-flags:
+	gcc *c3.c ~/libft.a mlx.a -Wall -Wextra -Werror -lXext -lX11 -lm && ./a.out
+l:
+	gcc *c3.c ~/libft.a mlx.a -lXext -lX11 -lm && ./a.out

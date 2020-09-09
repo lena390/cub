@@ -6,7 +6,7 @@
 /*   By: miphigen <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/21 16:24:19 by miphigen          #+#    #+#             */
-/*   Updated: 2020/09/01 16:52:50 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/09/08 22:00:21 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,14 +36,13 @@ char	*add_spaces_2_str(char *s1, int length)
 	if (!(s2 = malloc(length + 1)))
 		return (NULL);
 	i = 0;
-	if (s1)
-		temp = s1;
-		while (*temp != '\0')
-		{
-			s2[i] = *temp;
-			i++;
-			temp++;
-		}
+	temp = s1;
+	while (*temp != '\0')
+	{
+		s2[i] = *temp;
+		i++;
+		temp++;
+	}
 	while (i < length)
 		s2[i++] = ' ';
 	s2[i] = '\0';
@@ -79,7 +78,10 @@ void	set_hero(t_map *map, char c, int x, int y)
 {
 	map->hero_x = y;
 	map->hero_y = x;
-	map->hero_c = c;
+	c == 'W' ? map->hero_degr = 0 : 0; 
+	c == 'N' ? map->hero_degr = 90 : 0;
+	c == 'E' ? map->hero_degr = 180 : 0;
+	c == 'S' ? map->hero_degr = 270 : 0;
 }
 
 int		check_line(char *s)
@@ -125,11 +127,11 @@ int		is_valid_hor(char **array, t_map *map)
 		}
 		i++;
 	}
-	ret_value = map->hero_c == 0 ? 0 : ret_value;
+	ret_value = map->hero_degr == 0 ? 0 : ret_value;
 	return (ret_value & (check_line(array[i - 1]) & (check_line(array[0]))));
 }
 
-int		is_valid_vert(char **array1, t_map *map)
+int		is_valid_vert(char **array, t_map *map)
 {
 	int		ret_value;
 	int		i;
@@ -137,7 +139,6 @@ int		is_valid_vert(char **array1, t_map *map)
 	char	c1;
 	char	c2;
 
-	char **array = map->maze;
 	ret_value = 2;
 	i = 0;
 	while (i < map->maze_height && (array[i][0] == ' ' || array[i][0] == '1'))
@@ -166,8 +167,6 @@ int		is_valid_vert(char **array1, t_map *map)
 
 int	maze_is_valid(t_map *map)
 {
-	int ret_value;;
-
 	map->maze_width = get_max_width(map->maze);
 	if (!(map->maze = add_spaces(map->maze, map->maze_width, &map->maze_height)))
 		return (-1);

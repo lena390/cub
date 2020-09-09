@@ -6,91 +6,70 @@
 /*   By: miphigen <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/31 19:18:01 by miphigen          #+#    #+#             */
-/*   Updated: 2020/09/01 19:35:56 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/09/09 15:47:01 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-void	draw_1(t_img *img, int x, int y, int side_length)
+void	draw_012(t_img *img, int x, int y, int scale, int color)
 {
 	int	i;
 	int	j;
 
-	y *= side_length;
-	x *= side_length;
+	y *= scale;
+	x *= scale;
 	i = -1;
-	j = -2;
-	while (++j < side_length - 1)
-		img_pixel_put(img, x - 1, y + j, 0);
-	while (++i < side_length - 1)
+	while (++i < scale - 1)
 	{
 		j = -1;
-		while (++j < side_length - 1)
-			img_pixel_put(img, x + i, y + j, 0xffffff);
+		while (++j < scale - 1)
+			img_pixel_put(img, x + i, y + j, color);
 	}
 }
 
-void	draw_2(t_img *img, int x, int y, int side_length)
+void	draw_rays(t_img *img, int x, int y, t_map *map)
 {
-	int	i;
-	int	j;
+	double	tg;
+	int		i;
 
-	y *= side_length;
-	x *= side_length;
-	i = -1;
-	j = -2;
-	while (++j < side_length - 1)
-		img_pixel_put(img, x - 1, y + j, 0);
-	while (++i < side_length)
+	i = 0;
+	while (i < 50)
 	{
-		j = -1;
-		while (++j < side_length)
-			img_pixel_put(img, x + i, y + j, 0xfff000);
+		y = y - (x * tan(rad));
+		printf("x, y %d, %d\n", x + i, y);
+		img_pixel_put(img, x + i, y , 0xff0000);
 	}
 }
 
-void	draw_0(t_img *img, int x, int y, int side_length)
+void	draw_hero(t_img *img, int x, int y)
 {
-	int	i;
-	int	j;
-
-	y *= side_length;
-	x *= side_length;
-	j = -1;
-	--side_length;
-	while (++j < side_length)
+	int		i;
+	int		j;
+	
+	i = -8;
+	while (++i < 8)
 	{
-		img_pixel_put(img, x + side_length, y + j, 0xffffff);
-		img_pixel_put(img, x + j, y + side_length, 0xffffff);
+		j = -3;
+		while (++j < 3)
+		{	
+			img_pixel_put(img, x + i, y + j, 0);
+			img_pixel_put(img, x + j, y + i, 0);
+		}
 	}
+	img_pixel_put(img, x, y, 0xff0000);
 }
 
-void	draw_hero(t_img *img, int x, int y, int side_length)
-{
-	int	i;
-	int	j;
-	y *= side_length;
-	x *= side_length;
-	side_length -= 3;
-	i = 1;
-	while (++i < side_length)
-	{
-		j = 1;
-		while (++j < side_length)
-			img_pixel_put(img, x + i, y + j, 0xff00);
-	}
-}
-
-void	draw_map_2d(t_img *img, t_map *map, int side_length)
+void	draw_map_2d(t_img *img, t_map *map, int scale)
 {
 	int		i;
 	int		j;
 	char	**maze;
+	int		color;
 
-	printf("draw_map() at %d %d\n", map->hero_x, map->hero_y);
 	maze = map->maze;
 	i = -1;
+	puts("draw_map");
 	while (++i < map->maze_height)
 	{
 		j = -1;
@@ -98,13 +77,15 @@ void	draw_map_2d(t_img *img, t_map *map, int side_length)
 		{
 			char c = maze[i][j];
 			if (c == '1')
-				draw_1(img, j, i, side_length);
+				color = 0xffffff;
 			else if (c == '2')
-				draw_2(img, j, i, side_length);
+				color = 0xfff000;
 			else if (c == '0')
-				draw_0(img, j, i, side_length);
+				color = 0x777777;
+			draw_012(img, j, i, scale, color);
 		}
 	}
-	draw_hero(img, map->hero_x, map->hero_y, side_length);
-	draw_0(img, map->hero_x, map->hero_y, side_length);
+	puts("draw hero");
+	draw_hero(img, map->hero_x, map->hero_y);
+//	draw_rays(img, map->hero_x, map->hero_y, map);
 }

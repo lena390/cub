@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   cub_main.c                                         :+:      :+:    :+:   */
+/*   main_c3.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: miphigen <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/16 00:53:17 by miphigen          #+#    #+#             */
-/*   Updated: 2020/08/30 20:10:14 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/09/08 21:55:46 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ void	struct_init(t_map *map)
 	map->floor = -1;
 }
 
-int main(int ac, char **av)
+int main()//(int ac, char **av)
 {	
 	t_map	*map;
 	
@@ -30,16 +30,13 @@ int main(int ac, char **av)
 	parse_map(map, open("map.cub", O_RDONLY));
 	
 	char **array = map->maze;
-	int i = 0;
-	if (map->status == 2)
-		puts("map is valid");
-	else
-		puts("map is NOT valid");
-	printf("map status = %d\n", map->status);
-	while (array != NULL && *array != NULL)
-		printf("%2d : >%s<\n", i++, *array++);
 	if (map->status == 2)
 		render_map(map);
+	else
+	{
+		printf("map is NOT valid\nmap status = %d\n", map->status);
+		print_2d("", array);
+	}
 	//print error
 //	free_map(map);
 }

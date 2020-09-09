@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parse_map.c                                        :+:      :+:    :+:   */
+/*   parse_map_c3.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: miphigen <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/13 16:18:03 by miphigen          #+#    #+#             */
-/*   Updated: 2020/08/25 19:22:34 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/09/08 22:02:03 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,8 +35,6 @@ int		map_config_is_complete(t_map *map)
 
 void	parse_resolution(t_map *map, char *line)
 {
-	int 	value;
-
 	if (map->res_height != -1)
 	{
 		map->status = -2;//errno resolution config doubled
@@ -80,7 +78,6 @@ void	parse_rgb(t_map *map, char *line)
 	unsigned char	r;
 	unsigned char	g;
 	unsigned char	b;
-	int i;
 
 	id = line;
 	r = ft_atoi(++line);
