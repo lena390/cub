@@ -6,7 +6,7 @@
 /*   By: miphigen <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/16 00:53:17 by miphigen          #+#    #+#             */
-/*   Updated: 2020/09/08 21:55:46 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/09/22 23:25:20 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,27 +18,53 @@ void	struct_init(t_map *map)
 	map->res_height = -1;
 	map->ceil = -1;
 	map->floor = -1;
+	map->hero_direction = -1;
 }
 
-int main()//(int ac, char **av)
+void	free_2d_array(char **s, int size)
+{
+	int	i;
+
+	i = -1;
+	while (++i < size)
+	{
+		free(s[i]);
+	}
+	free(s);
+}
+
+void	free_map(t_map *map)
+{
+	puts("free_map() in a process");
+}
+
+int	set_error_and_exit(char *msg, t_map *map)
+{
+	if (msg)
+		ft_printf("Error\n%s (%d)\n", msg, map->status);
+	free_map(map);
+	exit(0);
+}
+
+int main(int ac, char **av)
 {	
 	t_map	*map;
 	
-	if ((map = ft_calloc(sizeof(t_map), 1)) == NULL)
-		return (0); //malloc error
-	struct_init(map);
-	parse_map(map, open("map.cub", O_RDONLY));
-	
-	char **array = map->maze;
-	if (map->status == 2)
-		render_map(map);
-	else
+	if ((map = ft_calloc(sizeof(t_map), 1)) != NULL)
 	{
-		printf("map is NOT valid\nmap status = %d\n", map->status);
-		print_2d("", array);
+		struct_init(map);
+		parse_map(map, open("map.cub", O_RDONLY));
+		if (map->status == 6)
+		{
+			if (ac >= 2 && ft_strncmp(av[1], "--save\0", 7) == 0) 
+				map->screenshot_needed = 1;	
+			render_map(map);
+		}
 	}
-	//print error
-//	free_map(map);
+	else
+		set_error_and_exit("Memory allocation failure", map);
+	free_map(map);
+
 }
 
 void	print_info(t_map *map)

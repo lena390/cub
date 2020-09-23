@@ -6,7 +6,7 @@
 /*   By: miphigen <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/13 16:18:03 by miphigen          #+#    #+#             */
-/*   Updated: 2020/09/08 22:02:03 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/09/21 17:23:47 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,29 +15,31 @@
 int		map_config_is_complete(t_map *map)
 {
 	if (map->res_width == -1 || map->res_height == -1)
-		return (-10);
+		set_error_and_exit("Missing resolution configuration", map);
 	else if (!map->path_NO)
-		return (-11);
+		set_error_and_exit("Missing north walls texture address", map);
 	else if (!map->path_SO)
-		return (-12);
-	else if (!map->path_S)
-		return (-13);
-	else if (map->floor == -1)
-		return (-14);
+		set_error_and_exit("Missing south walls texture address", map);
 	else if (!map->path_WE)
-		return (-15);
+		set_error_and_exit("Missing west walls texture address", map);
 	else if (!map->path_EA)
-		return (-16);
+		set_error_and_exit("Missing east walls texture address", map);
+	else if (!map->path_S)
+		set_error_and_exit("Missing sprite texture address", map);
+	else if (map->floor == -1)
+		set_error_and_exit("Missing floor color value", map);
 	else if (map->ceil == -1)
-		return (-17);
-	return (1);
+		set_error_and_exit("Missing ceil color value", map);
+	else
+		return (1);
+	return (0);
 }
 
 void	parse_resolution(t_map *map, char *line)
 {
 	if (map->res_height != -1)
 	{
-		map->status = -2;//errno resolution config doubled
+		set_error_and_exit("Repeated resolution configuration", map);
 		return ;
 	}
 	map->res_width = ft_atoi(++line);
@@ -45,7 +47,7 @@ void	parse_resolution(t_map *map, char *line)
 	line = ft_skip_characters(line, "0123456789");
 	map->res_height = ft_atoi(line);
 	if (map->res_height <= 0 || map->res_width <= 0)
-		map->status = -3;//errno invalid resolution
+		set_error_and_exit("Invalid resolution value", map);
 }
 
 void	parse_texture_addr(t_map *map, char *line)
@@ -67,7 +69,7 @@ void	parse_texture_addr(t_map *map, char *line)
 		map->path_S = line;
 	else
 	{
-		map->status = -4;//errno invalid identifier name or repeated config
+		set_error_and_exit("Invalid identifier name or repeated texture configuration", map);
 		free(line);
 	}
 }
@@ -90,13 +92,14 @@ void	parse_rgb(t_map *map, char *line)
 	else if (*id == 'C' && ft_is_in_set(" \t", *++id) == 1 && map->ceil == -1)
 		map->ceil = (r << 16 | g << 8 | b);
 	else
-		map->status = -5;//errno rgb config invalid
+		set_error_and_exit("Invalid color value or repeated color configuration", map);
 }
 
 void	parse_line(t_map *map, char *line, int fd)
 {
 	char *ptr;
 
+	map->status = 2;
 	ptr = line;
 	while (*line == ' ' || *line == '\t')
 		line++;
@@ -114,7 +117,7 @@ void	parse_line(t_map *map, char *line, int fd)
 			parse_maze(map, fd, ft_strdup(ptr));
 	}
 	else
-		map->status = -1; //invalid character
+		set_error_and_exit("Invalid character in map configuration", map);
 }
 
 void	parse_map(t_map *map, int fd)
@@ -122,11 +125,12 @@ void	parse_map(t_map *map, int fd)
 	char		*line;
 	int			ret_value;
 
-	while ((ret_value = get_next_line(fd, &line)) > 0 && map->status == 0)
+	map->status = 1;
+	while ((ret_value = get_next_line(fd, &line)) > 0 && map->msg == NULL)
 	{
 		parse_line(map, line, fd);
 		free(line);
 	}
 	if (ret_value == -1)
-		printf("invalid map addr\n");
+		set_error_and_exit("Error occurred while reading or opening file", map);
 }
