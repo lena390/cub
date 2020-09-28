@@ -6,7 +6,7 @@
 /*   By: miphigen <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/25 19:32:00 by miphigen          #+#    #+#             */
-/*   Updated: 2020/09/22 23:24:15 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/09/28 17:26:13 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,65 +14,95 @@
 
 //int	mlx_pixel_put(void *mlx_ptr, void *win_ptr, int x, int y, int color);
 
-void	change_direction(t_map *map, int angle)
+void	change_direction(t_map *map, double angle)
 {
-	
-	map->hero_direction += angle;
-	map->hero_direction >= 360 ? map->hero_direction %= 360 : 0;
-	map->hero_direction < 0 ? map->hero_direction += 360 : 0;
+	double a;
+
+	a = map->hero_direction;
+	a += angle;
+
+	if (a >= M_PI * 2)
+		a -= (M_PI * 2);
+	else if (a < 0)
+		a += (M_PI * 2);
+//	if (a == 0 || a == M_PI_2 || a == M_PI || a == M_PI_2 * 3)
+//		a -= ROTATION_SPEED;
+	map->hero_direction = a;
 }
 
-void	move_hero(t_map *map, int angle, int step)
+double		wall_ahead(t_map *map, double x, double y)
 {
-	int		x0;
-	int		y0;
+	if (map->maze[(int)(y / map->scale)][(int)(x / map->scale)] == '0')
+		return 0;
+	else if (map->maze[(int)(y / map->scale)][(int)(x / map->scale)] == '2')
+		return 2;
+	else
+		return 1;
+}
+
+void	swap_double(double *a, double *b)
+{
+	double c;
+
+	c = *a;
+	*a = *b;
+	*b = c;
+}
+
+void	mh_correct_values(double angle, double *x, double *y)//
+{
+	if (angle > 0 && angle < M_PI)
+		*y = *y * -1;
+	if (angle > M_PI_2 && angle < M_PI_2 * 3)
+		*x = *x * -1;
+	if (angle == 0 || angle == M_PI)
+	{
+		*x = angle == 0 ? STEP : -STEP;
+		*y = 0;
+	}
+	else if (angle == M_PI_2 || angle == M_PI_2 * 3)
+	{
+		*x = 0;
+		*y = angle == M_PI ? -STEP : STEP;
+	}	
+}
+
+void	move_hero(t_map *map, double angle)
+{
+	double	x;
+	double	y;
 
 	if (angle < 0)
-		angle += 360;
-	else if (angle >= 360)
-		angle -= 360;
-	x0 = ceil(fabs(cos(angle / (180.0 / M_PI)) * (double)step));
-	y0 = ceil(fabs(x0 * tan(angle / (180.0 / M_PI))));
-	if (angle > 0 && angle < 180)
-		y0 = -y0;
-	if (angle > 90 && angle < 270)
-		x0 = -x0;
-	if (angle == 0 || angle == 180)
+		angle += (M_PI) * 2;
+	else if (angle >= M_PI * 2)
+		angle -= (M_PI * 2);
+	x = fabs(cos(angle)) * STEP;
+	y = fabs(sin(angle)) * STEP;
+	mh_correct_values(angle, &x, &y);
+	x += map->hero_x;
+	y += map->hero_y;
+	if (!wall_ahead(map, x, y))
 	{
-		x0 = angle == 0 ? step : -step;
-		y0 = 0;
-	}
-	else if (angle == 90 || angle == 270)
-	{
-		x0 = 0;
-		y0 = angle == 90 ? -step : step;
-	}
-	if (map->maze[(map->hero_y + y0)/map->scale][(map->hero_x + x0) / map->scale] == '0')
-	{
-		map->hero_x += x0;
-		map->hero_y += y0;
+		map->hero_x = x;
+		map->hero_y = y;
 	}
 }
 
 int	process_key(int key, t_map *map)
 {
-	int		step;
-
 //	printf("key = %d\n", key);
-	step = 2;
-//	printf("%d\n", step);
 	if (key == 0 || key == 97)
-		move_hero(map, map->hero_direction + 90, step);
+		move_hero(map, map->hero_direction + M_PI_2);
 	else if (key == 1 || key == 115 || key == 65364)
-		move_hero(map, map->hero_direction + 180, step);
+		move_hero(map, map->hero_direction + M_PI);
 	else if (key == 2 || key == 100)
-		move_hero(map, map->hero_direction - 90, step);
+		move_hero(map, map->hero_direction - M_PI_2);
 	else if (key == 13 || key == 119 || key == 65362)
-		move_hero(map, map->hero_direction, step);
+		move_hero(map, map->hero_direction);
 	else if (key == 123 || key == 65361)
-		change_direction(map, 1);
+		change_direction(map, M_PI / 180);
 	else if (key == 124 || key == 65363)
-		change_direction(map, -1);
+		change_direction(map, - M_PI / 180);
 	else if (key == 65307)
 		set_error_and_exit(NULL, map);
 	else
@@ -99,7 +129,7 @@ void	render_map(t_map *map)
 	map->hero_x *= map->scale;
 	map->hero_y = map->hero_y * map->scale;	
 	draw_map_3d(map);
-	//draw_map_2d(map);
+//	draw_map_2d(map);
 	save_in_bmp(map->img2);
 	mlx_hook(g_win_ptr, 2, 1L<<0, process_key, map);
 	mlx_hook(g_win_ptr, 17, 1L<<17, set_error_and_exit, NULL);

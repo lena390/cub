@@ -6,7 +6,7 @@
 /*   By: miphigen <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/21 16:24:19 by miphigen          #+#    #+#             */
-/*   Updated: 2020/09/22 20:51:25 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/09/27 17:08:47 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,14 +27,14 @@ int		get_max_width(char **array)
 	return (max);
 }
 
-void	set_hero(t_map *map, char c, int x, int y)
+void	set_hero(t_map *map, char c, double x, double y)
 {
 	map->hero_x = y;
 	map->hero_y = x;
 	c == 'E' ? map->hero_direction = 0 : 0; 
-	c == 'N' ? map->hero_direction = 90 : 0;
-	c == 'W' ? map->hero_direction = 180 : 0;
-	c == 'S' ? map->hero_direction = 270 : 0;
+	c == 'N' ? map->hero_direction = M_PI_2 : 0;
+	c == 'W' ? map->hero_direction = M_PI : 0;
+	c == 'S' ? map->hero_direction = M_PI + M_PI_2 : 0;
 }
 
 int		check_line(char *s)

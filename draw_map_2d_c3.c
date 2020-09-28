@@ -6,7 +6,7 @@
 /*   By: miphigen <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/31 19:18:01 by miphigen          #+#    #+#             */
-/*   Updated: 2020/09/23 13:56:47 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/09/28 15:57:21 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,79 +37,166 @@ void	swap(int *a, int *b)
 	*b = c;
 }
 
-void	draw_ray(t_img *img, int x0, int y0, int angle, t_map *map)
+void	_create_ray(t_img *img, int x0, int y0, int angle, t_map *map)
 {
-	double	tg;
 	int		x1;
 	int		y1;
 	int		i;
+	int		x;
+	int		y;
+	double	tg;
 
+	printf("create_ray() angle = %d\n", angle);
+	x1 = 0;
+	y1 = 0;
 	if (angle < 0)
 		angle += 360;
 	else if (angle >= 360)
 		angle -= 360;
-	tg = tan(angle / (180.0 / M_PI));
 	i = -1;
 	while (++i > -1)
 	{
-		x1 = i;
-		y1 = floor(fabs(x1 * tg));	
+		x = i;
+		y = floor(fabs(x1 * tan(angle / (180.0 / M_PI))));	
 		if (angle == 0 || angle == 180)
-			y1 = 0;
+			y = 0;
 		else if (angle == 90 || angle == 270)
 		{	
-			x1 = 0;
-			y1 = angle == 270 ? i : -i;
+			x = 0;
+			y = angle == 270 ? i : -i;
 		}
 		else if (angle > 0 && angle < 180)
-			y1 = -y1;
+			y = -y;
 		if (angle > 90 && angle < 270)
-			x1 = -x1;
-		x1 = (x0 + x1);
-		y1 = (y0 + y1);
-		if (y1 / map->scale >= map->maze_height || x1 / map->scale >= map->maze_width ||
-			y1 / map->scale < 0 || x1 < map->scale | map->maze[y1 / map->scale][x1 / map->scale] != '0')
+			x = -x;
+		x = (x0 + x);
+		y = (y0 + y);
+		if (y / map->scale >= map->maze_height || x / map->scale >= map->maze_width ||
+			y / map->scale < 0 || x < map->scale | map->maze[y / map->scale][x / map->scale] != '0')
 			break;
-/*		
+		else
+		{
+			x1 = x;
+			y1 = y;
+		}
+		
 		if (angle != map->hero_direction)
-			img_pixel_put(img, x1, y1 , 0);
+			img_pixel_put(img, x1, y1 , 0xffffff);
 		else
 			img_pixel_put(img, x1, y1 , 0xff0000);
-*/
+
 	}
 	int 	steep;
-	int		x;
+//	int		x;
+//	int		y;
 	float	t;
-
+/*
 	steep = 0;
 	if ((int)fabs(x1 - x0) < (int)fabs(y1 - y0))
 	{
-		swap(x0, y0);
-		swap(x1, y1);
+		swap(&x0, &y0);
+		swap(&x1, &y1);
 		steep = 1;
 	}
-	if (x1 > x1)
+	if (x0 > x1)
 	{
-		swap(x0, x1);
-		swap(y0. y1);
+		swap(&x0, &x1);
+		swap(&y0, &y1);
 	}
-	x = x0 - 1;
-	while (++x < x1)
+	x = x0;
+	while (x <= x1)
 	{
-		
+		t = (x - x0) / (float)(x1 - 0);
+		y = y0 * (1.0 - t) + y1 * t;
+		if (steep)
+			img_pixel_put(img, y, x, 0xffffff);
+		else
+			img_pixel_put(img, x, y, 0xffffff);
+		x++;
 	}
+*/
+}
 
+void	draw_line(t_map *map, double x1, double y1, int steep)
+{
+	double	x0;
+	double	y0;
+	double	x;
+	double	y;
+	double	t;
+
+	steep = 0;
+	x0 = map->hero_x;
+	y0 = map->hero_y;
+	if ((fabs(x1 - x0)) < (fabs(y1 - y0)))
+	{
+		swap_double(&x0, &y0);
+		swap_double(&x1, &y1);
+		steep = 1;
+	}
+	if (x0 > x1)
+	{
+		swap_double(&x0, &x1);
+		swap_double(&y0, &y1);
+	}
+	x = x0;
+	while (x <= x1)
+	{
+		t = (x - x0) / (float)(x1 - 0);
+		y = y0 * (1.0 - t) + y1 * t;
+		if (steep)
+			img_pixel_put(map->img2, y, x, 0xff0000);
+		else
+			img_pixel_put(map->img2, x, y, 0xff0000);
+		x++;
+	}
+}
+
+void	create_ray(t_map *map, double angle)
+{
+//	printf("create_ray() angle = %d\n", angle);
+	double	x1;
+	double	y1;
+	double	x;
+	double	y;
+	int		i;
+
+	if (angle < 0)
+		angle += (M_PI) * 2;
+	else if (angle >= M_PI * 2)
+		angle -= (M_PI * 2);
+	if (angle == 0 || angle == M_PI_2 || angle == M_PI || angle == M_PI_2 * 3)
+		angle += M_PI / 180;
+	i = 0;
+	x1 = 0;
+	y1 = 0;
+	while (++i)
+	{
+		x = fabs(cos(angle)) * STEP * i;
+		y = fabs(sin(angle)) * STEP * i;
+		mh_correct_values(angle, &x, &y);
+		if (wall_ahead(map, x + map->hero_x, y + map->hero_y))
+			break ;
+		else
+	 	{
+			x1 = x;
+			y1 = y;
+		}
+	}
+	draw_line(map, map->hero_x + x1, map->hero_y + y1, 0);
 }
 
 void	draw_rays(t_img *img, t_map *map)
 {
-	int d_min;
-	int	d_max;
+	double	d_min;
+	double	d_max;
+	
 	d_min = map->hero_direction - ANGLE_OV / 2;
 	d_max = map->hero_direction + ANGLE_OV / 2;
-	while (++d_min < d_max)
+	while (d_min < d_max)
 	{
-		draw_ray(img, map->hero_x, map->hero_y, d_min, map);
+		create_ray(map, d_min);
+		d_min += M_PI / 180;
 	}
 }
 
@@ -130,7 +217,7 @@ void	draw_hero(t_img *img, int x, int y)
 	}
 }
 
-void	draw_line(t_img *img, int i, int length, char c)
+void	draw_check_pattern(t_img *img, int i, int length, char c)
 {
 	int j;
 
@@ -174,17 +261,17 @@ void	draw_map_2d(t_map *map)
 	//рисую сетку
 	while (i < map->img.height)
 	{	
-		draw_line(&map->img, i, map->img.width, 'h');
+		draw_check_pattern(&map->img, i, map->img.width, 'h');
 		i += map->scale;
 	}
 	i = map->scale;
 	while (i < map->img.width)
 	{	
-		draw_line(&map->img, i, map->img.height, 'v');
+		draw_check_pattern(&map->img, i, map->img.height, 'v');
 		i += map->scale;
 	}
 	draw_hero(&map->img, map->hero_x, map->hero_y);
-//	draw_rays(&map->img, map);
-	draw_ray(&map->img, map->hero_x, map->hero_y, map->hero_direction, map);
+	draw_rays(&map->img, map);
+//	create_ray(map, map->hero_direction);
 //	put_image_to_window(&map->img, 0, map->res_height / 4 * 3 );
 }

@@ -6,7 +6,7 @@
 /*   By: miphigen <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/16 00:53:17 by miphigen          #+#    #+#             */
-/*   Updated: 2020/09/22 23:25:20 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/09/27 16:49:53 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ void	struct_init(t_map *map)
 	map->res_height = -1;
 	map->ceil = -1;
 	map->floor = -1;
-	map->hero_direction = -1;
+	map->hero_direction = -1.;
 }
 
 void	free_2d_array(char **s, int size)
@@ -54,6 +54,7 @@ int main(int ac, char **av)
 	{
 		struct_init(map);
 		parse_map(map, open("map.cub", O_RDONLY));
+		maze_is_valid(map);
 		if (map->status == 6)
 		{
 			if (ac >= 2 && ft_strncmp(av[1], "--save\0", 7) == 0) 

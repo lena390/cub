@@ -6,7 +6,7 @@
 /*   By: miphigen <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/17 18:47:49 by miphigen          #+#    #+#             */
-/*   Updated: 2020/09/21 17:26:32 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/09/27 16:49:43 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,5 +75,4 @@ void	parse_maze(t_map *map, int fd, char *str)
 	map->status = 3;
 	if ((map->maze = get_maze(fd, str, map)) == NULL )
 		set_error_and_exit("Memory allocation failure", map);
-	maze_is_valid(map);
 }
