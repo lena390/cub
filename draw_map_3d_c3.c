@@ -6,19 +6,25 @@
 /*   By: miphigen <miphigen@student.21-school.ru>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/12 10:11:05 by miphigen          #+#    #+#             */
-/*   Updated: 2020/09/28 20:47:30 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/09/29 14:57:16 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-double		get_ray_length(t_map *map, double x0, double y0, double angle)
+t_wall		get_wall_info_loop(t_map *map, double x0, double y0, double angle)
+{
+	static int	i;
+}
+
+t_wall	get_wall_info(t_map *map, double x0, double y0, double angle)
 {
 	double	x1;
 	double	y1;
-	double	i;	
+	double	i;
 	double	x;
 	double	y;
+	t_wall	wall;
 
 	if (angle < 0)
 		angle += (M_PI) * 2;
@@ -41,27 +47,29 @@ double		get_ray_length(t_map *map, double x0, double y0, double angle)
 			break;
 		i += 2;
 	}
+	int j;
 	while (1)
 	{
 		x = fabs(cos(angle)) * i;
 		y = fabs(sin(angle)) * i;
 		mh_correct_values(angle, &x, &y);
-		if (!wall_ahead(map, x + map->hero_x, y + map->hero_y))
+		if (!(wall.type = wall_ahead(map, x + map->hero_x, y + map->hero_y)))
 		{
 			x1 = x;
 			y1 = y;
 		}
 		else
 			break;
-		i += 0.4;
+		i += 0.35;
 	}
-	double dist = sqrt(pow(x1, 2) + pow(y1, 2));
-//	printf("dist = %f\n", dist);
+	wall.dist = sqrt(pow(x1, 2) + pow(y1, 2));
+	
+//	printf("wall = %d, angle = %f, dist = %f\n", j, angle / (M_PI / 180), dist);
 	//dist = (fabs((x1) / cos(angle)));
-	return dist;
+	return wall;
 }
 
-void	draw_section(t_map *map, int x0, int x1, float dist)
+void	draw_section(t_map *map, int x0, int x1, t_wall wall)
 {
 	t_img	*img;
 	int		i;
@@ -70,7 +78,7 @@ void	draw_section(t_map *map, int x0, int x1, float dist)
 	int		wall_max_h;
 	int		color_wall = 0xff5c77;
 	
-	wall_h = ceil((map->scale * map->img2->height) / (dist));
+	wall_h = ceil((map->scale * map->img2->height) / (wall.dist));
 	wall_max_h = map->img2->height;
 	wall_h >= wall_max_h ? (wall_h = wall_max_h) : 0;
 	y_skyline = map->img2->height / 2;
@@ -83,6 +91,7 @@ void	draw_section(t_map *map, int x0, int x1, float dist)
 			img_pixel_put(map->img2, x0, map->img2->height - i, map->floor);
 		}
 		i = -1;
+		if (wall.type == 1);//общая на все типы стен ф-ция натягивания текстуры(тип стены, ссылка на текстуру)
 		while (++i < wall_h / 2)
 		{
 			img_pixel_put(map->img2, x0, y_skyline + i + 1, color_wall);
@@ -108,7 +117,7 @@ void	draw_map_3d(t_map *map)
 	i = 0;
 	while (d_max >= d_min)
 	{
-		draw_section(map, i, i + section_width,	get_ray_length(map, map->hero_x, map->hero_y, d_max));
+		draw_section(map, i, i + section_width,	get_wall_info(map, map->hero_x, map->hero_y, d_max));
 		i += section_width;
 		d_max -= (M_PI / 3) / rays_number;
 	}

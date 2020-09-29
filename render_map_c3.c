@@ -6,7 +6,7 @@
 /*   By: miphigen <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/25 19:32:00 by miphigen          #+#    #+#             */
-/*   Updated: 2020/09/28 17:26:13 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/09/29 13:59:54 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,14 +30,14 @@ void	change_direction(t_map *map, double angle)
 	map->hero_direction = a;
 }
 
-double		wall_ahead(t_map *map, double x, double y)
+char	wall_ahead(t_map *map, double x, double y)
 {
 	if (map->maze[(int)(y / map->scale)][(int)(x / map->scale)] == '0')
 		return 0;
 	else if (map->maze[(int)(y / map->scale)][(int)(x / map->scale)] == '2')
 		return 2;
 	else
-		return 1;
+		return 1;//добавить распознавалку о стороне света
 }
 
 void	swap_double(double *a, double *b)
