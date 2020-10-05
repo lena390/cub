@@ -6,7 +6,7 @@
 /*   By: miphigen <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/16 00:53:17 by miphigen          #+#    #+#             */
-/*   Updated: 2020/09/27 16:49:53 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/10/03 14:11:33 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,10 @@ void	struct_init(t_map *map)
 	map->ceil = -1;
 	map->floor = -1;
 	map->hero_direction = -1.;
+//	map->sp_location = malloc(10);
+	map->img2 = malloc(sizeof(t_img));//free()!!
+	map->sp_location = malloc(sizeof(double) * 4);
+	if (!map->sp_location) set_error_and_exit("Memory allocation failure", map); 
 }
 
 void	free_2d_array(char **s, int size)

@@ -6,7 +6,7 @@
 /*   By: miphigen <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/16 00:30:20 by miphigen          #+#    #+#             */
-/*   Updated: 2020/09/28 20:47:07 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/10/04 22:06:47 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,16 +19,16 @@
 # define MLX_SYNC_IMAGE_WRITABLE    1 
 # define MLX_SYNC_WIN_FLUSH_CMD     2
 # define MLX_SYNC_WIN_CMD_COMPLETED 3
-# define ANGLE_OV M_PI / 3
-# define STEP 5 
-# define ROTATION_SPEED M_PI /180 
 
+# define ANGLE_OV M_PI / 3
+# define STEP 16//надо сделать зависимой от scale
+# define ROTATION_SPEED M_PI / 90 
+# define PPR 5 
 typedef struct	s_wall_info
 {
 	double		dist;
 	char		type;
-	char		is_sprite;
-}				t_wall_info;
+}				t_wall;
 
 typedef struct	s_map_info
 {
@@ -54,22 +54,24 @@ typedef struct	s_map_info
 	double		hero_direction;
 
 	int			scale;
+	int			section_width;
 	t_img		img;
 	t_img		*img2;
+	double		*sp_location;
 }				t_map;
 
 void	 		parse_map(t_map *map, int fd);
 void			parse_maze(t_map *map, int fd, char *str);
 void			maze_is_valid(t_map *map);
 void			render_map(t_map *map);
-void			draw_map_2d(t_map *map);
-void			draw_map_3d(t_map *map);
+void			draw_2d_image(t_map *map);
+void			draw_3d_image(t_map *map);
 double			get_ray_length(t_map *map, double x, double y, double angle);
 void			save_in_bmp(t_img *img);
 int				set_error_and_exit(char *msg, t_map *map);
 void			free_2d_array(char **s, int size);
 void			swap_double(double *a, double *b);
-double			wall_ahead(t_map *map, double x, double y);
+char			move_on(t_map *map, double x, double y, int scale);
 void			mh_correct_values(double angle, double *x, double *y);
 void			print_info(t_map *map);//
 void			print_2d(char *s, char **array);//

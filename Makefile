@@ -7,5 +7,7 @@ l:
 	gcc *c3.c ~/libft.a mlx.a -lXext -lX11 -lm && ./a.out
 lg:
 	gcc *c3.c ~/libft.a mlx.a -lXext -lX11 -lm -g && gdb ./a.out
+c:
+	gcc *c3.c ~/libft.a mlx.a -lXext -lX11 -lm -g
 test:
 	gcc my_mlx*.c test.c ~/libft.a mlx.a -lXext -lX11 -lm && ./a.out
