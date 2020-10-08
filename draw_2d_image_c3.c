@@ -6,7 +6,7 @@
 /*   By: miphigen <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/31 19:18:01 by miphigen          #+#    #+#             */
-/*   Updated: 2020/10/04 19:38:52 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/10/06 15:55:25 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,13 +19,15 @@ void	draw_012(t_img *img, int x, int y, int scale, int color)
 
 	y *= scale;
 	x *= scale;
-	i = 0;
+	i = -1;
 	while (++i < scale)
 	{
-		j = 0;
+		j = -1;
 		while (++j < scale)
 			img_pixel_put(img, x + i, y + j, color);
 	}
+	img_pixel_put(img, x , y, 0);
+
 }
 
 void	swap(int *a, int *b)
@@ -58,14 +60,12 @@ t_line	line_params(double x0, double y0, double x1, double y1)
 	return (l);
 }
 
-void	draw_line(t_map *map, t_line l)
+void	draw_line(t_map *map, t_line l, int color)
 {
 	double	x;
 	double	y;
 	double	t;
 
-	l.x0 = map->hero_x / 4;
-	l.y0 = map->hero_y / 4;
 	if ((fabs(l.x1 - l.x0)) < (fabs(l.y1 - l.y0)))
 	{
 		swap_double(&l.x0, &l.y0);
@@ -83,9 +83,9 @@ void	draw_line(t_map *map, t_line l)
 		t = (x - l.x0) / (float)(l.x1 - 0);
 		y = l.y0 * (1.0 - t) + l.y1 * t;
 		if (l.steep)
-			img_pixel_put(map->img2, y, x, 0xff0000);
+			img_pixel_put(map->img2, y, x, color);
 		else
-			img_pixel_put(map->img2, x, y, 0xff0000);
+			img_pixel_put(map->img2, x, y, color);
 		x++;
 	}
 }
@@ -108,12 +108,13 @@ void	create_ray(t_map *map, double angle)
 	i = 0;
 	x1 = 0;
 	y1 = 0;
+	double tg = fabs(tan(angle));
 	while (++i)
 	{
-		x = fabs(cos(angle)) * i;
-		y = fabs(sin(angle)) * i;
+		x = i;
+		y = tg * x;
 		mh_correct_values(angle, &x, &y);
-		if (move_on(map, x + map->hero_x / 4, y + map->hero_y / 4, map->scale / 4))
+		if (!move_on(map, x + map->hero_x / 4, y + map->hero_y / 4, map->scale / 4))
 			break ;
 		else
 	 	{
@@ -122,7 +123,7 @@ void	create_ray(t_map *map, double angle)
 		}
 	}
 	draw_line(map, line_params(map->hero_x / 4, map->hero_y / 4,
-				map->hero_x / 4 + x1, map->hero_y / 4 + y1));
+				map->hero_x / 4 + x1, map->hero_y / 4 + y1), 0);
 }
 
 void	draw_rays(t_img *img, t_map *map)
@@ -132,28 +133,17 @@ void	draw_rays(t_img *img, t_map *map)
 	
 	d_min = map->hero_direction - ANGLE_OV / 2;
 	d_max = map->hero_direction + ANGLE_OV / 2;
-	create_ray(map, d_min);
-	create_ray(map, d_max);
+	while (d_max >= d_min)
+	{	
+		create_ray(map, d_max);
+		d_max -= (M_PI / 3) / 60; 
+	}
 }
 
 void	draw_hero(t_map *map, t_img *img, int hero_x, int hero_y)
 {
-	int	width;
-	int	height;
-	int	ax;
-	int	ay;
-	int	bx;
-	int	by;
+	img_pixel_put(map->img2, hero_y, hero_x, 0xff0000);
 
-	ax = (int)ceil(cos(map->hero_direction * (map->img.width / map->maze_width)));
-	ay = (int)ceil(sin(map->hero_direction * ( map->img.width / map->maze_width)));
-	bx = (int)ceil(cos((map->hero_direction + M_PI_4 * 3) * map->img.width / map->maze_width));
-	by = (int)ceil(sin((map->hero_direction + M_PI_4 * 3) * map->img.width / map->maze_width));
-
-	draw_line(map, line_params(ax, ay, bx, by));
-	//draw_line(map, line_params(map, ax, ay, bx + (ax - bx), by));
-
-	
 }
 
 void	draw_check_pattern(t_img *img, int i, int length, char c)
@@ -192,26 +182,26 @@ void	draw_2d_image(t_map *map)
 		{
 			char c = maze[i][j];
 			if (c == '1')
-				draw_012(&map->img, j, i, scale, 0xffffff);
+				draw_012(&map->img, j, i, scale, 0x777777);
 			else if (c == '2')
 				draw_012(&map->img, j, i, scale, 0xfff000);
 			else if (c == '0')
-				draw_012(&map->img, j, i, scale, 0x777777);
+				draw_012(&map->img, j, i, scale, 0xfffffff);
 		}
 	}
-	i = scale;
-	while (i < map->img.height)
-	{	
-		draw_check_pattern(&map->img, i, map->img.width, 'h');
-		i += scale;
-	}
-	i = scale;
-	while (i < map->img.width)
-	{	
-		draw_check_pattern(&map->img, i, map->img.height, 'v');
-		i += scale;
-	}
-//	draw_hero(map, &map->img, (int)map->hero_x / 4, (int)map->hero_y / 4);
-//	draw_rays(&map->img, map);
+//	i = scale;
+//	while (i < map->img.height)
+//	{	
+//		draw_check_pattern(&map->img, i, map->img.width, 'h');
+//		i += scale;
+//	}
+//	i = scale;
+//	while (i < map->img.width)
+//	{	
+//		draw_check_pattern(&map->img, i, map->img.height, 'v');
+//		i += scale;
+//	}
+	draw_hero(map, &map->img, (int)map->hero_x / 4, (int)map->hero_y / 4);
+	draw_rays(&map->img, map);
 	put_image_to_window(&map->img, 0, map->res_height / 4 * 3 );
 }

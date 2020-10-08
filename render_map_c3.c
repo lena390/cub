@@ -6,7 +6,7 @@
 /*   By: miphigen <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/25 19:32:00 by miphigen          #+#    #+#             */
-/*   Updated: 2020/10/04 19:35:55 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/10/07 17:10:08 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@ void	change_direction(t_map *map, double angle)
 {
 	double a;
 
+	map->status = 10;
 	a = map->hero_direction;
 	a += angle;
 
@@ -32,12 +33,19 @@ void	change_direction(t_map *map, double angle)
 
 char	move_on(t_map *map, double x, double y, int scale)
 {
-	if (map->maze[(int)(y / scale)][(int)(x / scale)] == '1')
-		return 0;//добавить распознавалку о стороне света
-	else if (map->maze[(int)(y / scale)][(int)(x / scale)] == '2')
-		return 2;
-	else 
-		return 10;
+	char c;
+
+	if (y >= map->maze_height * scale || x >= map->maze_width * scale)
+	{
+		y >= map->img2->height - 1 ? y = map->img2->height : 0 ; 
+		x >= map->img2->width - 1 ? x = map->img2->width : 0;
+		return (0);
+	}
+	c = map->maze[(int)floor(y / scale)][(int)floor(x / scale)];
+	if (c == '1' || c == ' ')
+		return (0);
+	else
+		return (c);
 }
 
 void	swap_double(double *a, double *b)
@@ -72,6 +80,7 @@ void	move_hero(t_map *map, double angle)
 	double	x;
 	double	y;
 
+	map->status = 9;
 	if (angle < 0)
 		angle += (M_PI) * 2;
 	else if (angle >= M_PI * 2)
@@ -92,6 +101,7 @@ void	move_hero(t_map *map, double angle)
 int	process_key(int key, t_map *map)
 {
 	//printf("key = %d direction = %f\n", key, map->hero_direction);
+	map->status = 8;
 	if (key == 0 || key == 97)
 		move_hero(map, map->hero_direction + M_PI_2);
 	else if (key == 1 || key == 115 || key == 65364)
@@ -133,13 +143,14 @@ void	check_resolution(t_map *map)
 
 void	render_map(t_map *map)
 {
+	map->status = 7;
 	g_mlx_ptr = mlx_init();
 	check_resolution(map);
 	set_new_coordinates(map);	
 	g_win_ptr = mlx_new_window(g_mlx_ptr, map->res_width, map->res_height, "Hello raycaster");
 	new_image(&map->img, map->maze_width * (map->scale / 4), map->maze_height * (map->scale / 4));
 	draw_3d_image(map);
-	save_in_bmp(map->img2);
+//	save_in_bmp(map->img2);
 	mlx_hook(g_win_ptr, 2, 1L<<0, process_key, map);
 	mlx_hook(g_win_ptr, 17, 1L<<17, set_error_and_exit, NULL);
 	mlx_loop(g_mlx_ptr);

@@ -4,7 +4,7 @@ all:
 l-with-flags:
 	gcc *c3.c ~/libft.a mlx.a -Wall -Wextra -Werror -lXext -lX11 -lm && ./a.out
 l:
-	gcc *c3.c ~/libft.a mlx.a -lXext -lX11 -lm && ./a.out
+	gcc *c3.c ~/libft.a mlx.a -lXext -lX11 -lm -g && ./a.out
 lg:
 	gcc *c3.c ~/libft.a mlx.a -lXext -lX11 -lm -g && gdb ./a.out
 c:

@@ -6,7 +6,7 @@
 /*   By: miphigen <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/16 00:30:20 by miphigen          #+#    #+#             */
-/*   Updated: 2020/10/04 22:06:47 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/10/06 23:25:36 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@
 # define ANGLE_OV M_PI / 3
 # define STEP 16//надо сделать зависимой от scale
 # define ROTATION_SPEED M_PI / 90 
-# define PPR 5 
+# define PPR 10 
 typedef struct	s_wall_info
 {
 	double		dist;
