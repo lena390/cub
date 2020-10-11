@@ -6,7 +6,7 @@
 /*   By: miphigen <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/31 19:18:01 by miphigen          #+#    #+#             */
-/*   Updated: 2020/10/10 14:59:50 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/10/11 15:37:42 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -152,7 +152,7 @@ void	draw_rays(t_img *img, t_map *map)
 
 void	draw_hero(t_map *map, t_img *img, int hero_x, int hero_y)
 {
-	img_pixel_put(map->img2, hero_y, hero_x, 0xff0000);
+	img_pixel_put(map->img2, hero_y / map->scale, hero_x / map->scale, 0xff0000);
 
 }
 
@@ -211,7 +211,7 @@ void	draw_2d_image(t_map *map)
 //		draw_check_pattern(&map->img, i, map->img.height, 'v');
 //		i += scale;
 //	}
-//	draw_hero(map, &map->img, (int)(map->hero_x / 4) - 1, (int)(map->hero_y / 4) - 1);
+//	draw_hero(map, &map->img, (int)(map->hero_x) - 1, (int)(map->hero_y / 4) - 1);
 //	draw_rays(&map->img, map);
 	put_image_to_window(&map->img, 0, 0);
 }
