@@ -6,7 +6,7 @@
 /*   By: miphigen <miphigen@student.21-school.ru>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/12 10:11:05 by miphigen          #+#    #+#             */
-/*   Updated: 2020/10/08 16:08:57 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/10/11 14:04:35 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,79 +87,90 @@ void	put_sprites_to_image(t_map *map)
 	free(tab);
 }
 
+char	move_on(t_map *map, double x, double y, int scale)
+{
+	char c;
+
+	if (y >= map->maze_height * scale || x >= map->maze_width * scale)
+	{
+		y >= map->img2->height - 1 ? y = map->img2->height : 0 ; 
+		x >= map->img2->width - 1 ? x = map->img2->width : 0;
+		return (1);
+	}
+	else if (y < 0 || x < 0)
+		return (1);
+	c = map->maze[(int)floor(y / scale)][(int)floor(x / scale)];
+	if (c == '1' || c == ' ')
+		return (1);
+	else
+		return (c);
+}
+
 void	vertical_cross(t_map *map, t_wall *wall, double angle)
 {
+	
 	double	x;
 	double	y;
-	double	x1;
-	double	y1;
 	int		step;
-	
-	if ((angle > M_PI_2 * 3 && angle < M_PI_2) || x == (int)x)
-		x = (map->hero_x / map->scale) * map->scale;
-	else
-		x = (map->hero_x / map->scale + 1) * map->scale;
+	double	tg;
+
 	step = map->scale;
-	double tg = fabs(tan(angle));
-	x1 = x;
-	y1 = tg * x;
-	if (angle > M_PI_2 && angle < M_PI_2 * 3)
-	step *= -1;
+	tg = tan(angle);
+	if ((angle >= M_PI_2 * 3 && angle <= M_PI_2) || x == floor(x))
+		x = floor(map->hero_x / step) * step;
+	else
+	{
+		x = floor(map->hero_x / step + 1) * step;
+		step *= -1;
+	}
+	y = (x * tg) + map->hero_y - (map->hero_x * tg);
 	while (x < map->img2->width)
 	{
-		y = tg * (x - map->hero_x);
-/*		if (angle > 0 && angle < M_PI)
-			y = map->hero_y - y;
-		else
-			y = map->hero_y + y;
-*/		if ((wall->type = move_on(map, x, y, map->scale)))
-		{
-			x1 = x;
-			y1 = y;
-		}
-		else
+		y = (x * tg) + map->hero_y - (map->hero_x * tg);
+		wall->type = move_on(map, x, y, map->scale);
+		if (wall->type == 1)
 			break;
+		if (wall->type == 2);//add sprite
 		x += step;
 	}
-	wall->dist = sqrt(pow(x1, 2) + pow(y1, 2));
+	wall->dist = sqrt(pow(x - map->hero_x, 2) + pow(y - map->hero_y, 2));
+	if (angle >= M_PI_2 && angle < M_PI_2 * 3)
+		wall->type = 'W';
+	else
+		wall->type = 'E';
 }
 
 void	horizontal_cross(t_map *map, t_wall *wall, double angle)
 {
 	double	x;
 	double	y;
-	double	x1;
-	double	y1;
 	int		step;
-	
-	if ((angle > M_PI && angle < M_PI * 2) || y == (int)y)
-		y = (map->hero_y / map->scale) * map->scale;
-	else
-		y = (map->hero_y / map->scale + 1) * map->scale;
+	double	tg;
+
 	step = map->scale;
-	double tg = fabs(tan(angle));
-	y1 = y;
-	x1 = y / tg;
-	if (angle > 0 && angle < M_PI)
+	tg = tan(angle);
+	if ((angle >= M_PI && angle <= M_PI * 2) || map->hero_y == floor(map->hero_y))
+		y = floor(map->hero_y / step) * step;
+	else
+	{
+		y = floor(map->hero_y / step + 1) * step;
 		step *= -1;
+	}
+	x = (y / tg) + map->hero_x - (map->hero_y / tg);
 	while (y < map->img2->height)
 	{
-		x = y / tg;
-/*		if (angle > M_PI_2 && angle < M_PI_2 * 3)
-			x = map->hero_x - x;
-		else
-			x = map->hero_x + x;
-*/		if ((wall->type = move_on(map, x, y, map->scale)))
-		{
-			x1 = x;
-			y1 = y;
-		}
-		else
+		x = (y / tg) + map->hero_x - (map->hero_y / tg);
+		wall->type = move_on(map, x, y, map->scale);
+		if (wall->type == 1)
 			break;
+		if (wall->type == 2);//add sprite
 		y += step;
 	}
-	wall->dist = sqrt(pow(x1, 2) + pow(y1, 2));
-
+	wall->dist = sqrt(pow(x - map->hero_x, 2) + pow(y - map->hero_y, 2));
+if (angle >= 0 && angle < M_PI)
+		wall->type = 'N';
+	else
+		wall->type = 'S';
 }
 
 t_wall	get_wall_inf_and_collect_sprite_loc(t_map *map, double angle, double next)
@@ -172,41 +183,53 @@ t_wall	get_wall_inf_and_collect_sprite_loc(t_map *map, double angle, double next
 		angle += (M_PI) * 2;
 	else if (angle >= M_PI * 2)
 		angle -= (M_PI * 2);
-//	if (angle == 0  || angle == M_PI_2 || angle == M_PI || angle == M_PI_2 * 3)
-//		angle += next ;
-//	if ()
+	if (angle == 0  || angle == M_PI_2 || angle == M_PI || angle == M_PI_2 * 3)
+	{	
+		angle += next;
+		printf("get_wall_inf() angle == %f\n", angle);
+	}
 	horizontal_cross(map, &wall1, angle);
 	vertical_cross(map, &wall2, angle);
-	if (wall1.dist < wall2.dist)
-		return wall1;
-	else
-		return wall2;
+//	printf("wall1 dist: %f. wall2 dist: %f\n", wall1.dist, wall2.dist);
+	if (wall1.dist > wall2.dist)
+		 wall1 = wall2;
+	return wall1;
 }
 
 void	draw_section(t_map *map, int x0, int x1, t_wall wall)
 {
-	t_img	*img;
-	int		i;
+	t_img			*img;
+	int				i;
 	unsigned int	wall_h;
-	int	y_skyline;
-	int	color_wall = 0x887fff;
+	int				y_skyline;
+	int				color_wall = 0x887fff;
 
+	if (wall.type == 'N')
+		color_wall = 0x887fff;
+	else if (wall.type == 'S')
+		color_wall = 0xff8884;
+	else if (wall.type == 'W')
+		color_wall = 0xc2ff78;
+	else
+		color_wall = 0xfff780;
+		
 	map->status = 15;
 	wall_h = ceil((map->scale * map->img2->height) / (wall.dist));
-//	wall_h = (int)floor(map->img2->height * 2 - wall.dist) / 2;//высота стены получается отрицательнойц!!
-	wall_h < 50 ? wall_h = 50: 0;
+	wall_h < 0 ? puts("draw_section() высота стены меньше 0") : 0;
+	wall_h >= map->img2->height? wall_h = map->img2->height : 0;
 	y_skyline = map->img2->height / 2;
 	while (x0 < x1)
 	{
 		i = 0;
-		while (++i <= y_skyline - wall_h / 2)
+		while (++i <= y_skyline - wall_h / 2 + 1)
 		{
 			img_pixel_put(map->img2, x0, i, map->ceil);
-			img_pixel_put(map->img2, x0, map->img2->height - i, map->floor);
+			img_pixel_put(map->img2, x0, map->img2->height - i - 1, map->floor);
 		}
 		i = -1;
-		if (wall.type == 1);//общая на все типы стен ф-ция натягивания текстуры(тип стены, ссылка на текстуру)
-		while (++i < wall_h / 2)
+		if (wall.type == 1)
+			add_texture(map);
+		while (++i < wall_h / 2 - 1)
 		{
 			img_pixel_put(map->img2, x0, y_skyline + i + 1, color_wall);
 			img_pixel_put(map->img2, x0, y_skyline - i, color_wall);
@@ -214,6 +237,11 @@ void	draw_section(t_map *map, int x0, int x1, t_wall wall)
 		x0++;
 	}
 //	printf("dist: %f wall_h: %u\n", wall.dist, wall_h);
+}
+
+void	add_texture(t_map *map)
+{
+	
 }
 
 void	draw_3d_image(t_map *map)
@@ -225,6 +253,7 @@ void	draw_3d_image(t_map *map)
 	double f = M_PI / 180;
 //	printf("direction %f location %f %f\n", map->hero_direction / f, map->hero_x, map->hero_y);
 //	puts("new image");
+//	printf("%f %f\n", map->hero_x, map->hero_y);
 	map->status = 11;
 	new_image(map->img2, map->res_width, map->res_height);
 	rays_number = map->img2->width / PPR;
@@ -232,26 +261,16 @@ void	draw_3d_image(t_map *map)
 	r_min = (map->hero_direction - ANGLE_OV / 2);
 	r_max = (map->hero_direction + ANGLE_OV / 2);
 	add_sprite(map, 0, 0, 1);
-	i = map->section_width;
-	while (i <= map->img2->width)
+	i = 0;
+	while (i < map->img2->width)
 	{	
-		draw_section(map, i - map->section_width, i,
+		draw_section(map, i, i + map->section_width,
 			get_wall_inf_and_collect_sprite_loc(map, r_max, (M_PI / 3) / rays_number));
 		i += map->section_width;
 		r_max -= (M_PI / 3) / rays_number;
 	}
 	//2put_sprites_to_image(map);
 	put_image_to_window(map->img2, 0, 0);
-//	draw_2d_image(map);
-//	put_image_to_window(&map->img, 0, 0);
 	mlx_destroy_image(g_mlx_ptr, map->img2->ptr);
-	if (map->hero_direction == M_PI_2)
-	puts("hero 90");
-else if (map->hero_direction == M_PI)
-	puts("hero 180");
-else if (map->hero_direction == M_PI_2 * 3)
-	puts("hero 270");
-else if (map->hero_direction == 0)
-	puts("hero 0");
 
 }

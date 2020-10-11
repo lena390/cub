@@ -6,7 +6,7 @@
 /*   By: miphigen <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/16 00:30:20 by miphigen          #+#    #+#             */
-/*   Updated: 2020/10/06 23:25:36 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/10/10 20:42:47 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@
 # define MLX_SYNC_WIN_CMD_COMPLETED 3
 
 # define ANGLE_OV M_PI / 3
-# define STEP 16//надо сделать зависимой от scale
+# define STEP 5 
 # define ROTATION_SPEED M_PI / 90 
 # define PPR 10 
 typedef struct	s_wall_info
@@ -71,7 +71,6 @@ void			save_in_bmp(t_img *img);
 int				set_error_and_exit(char *msg, t_map *map);
 void			free_2d_array(char **s, int size);
 void			swap_double(double *a, double *b);
-char			move_on(t_map *map, double x, double y, int scale);
 void			mh_correct_values(double angle, double *x, double *y);
 void			print_info(t_map *map);//
 void			print_2d(char *s, char **array);//

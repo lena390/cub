@@ -6,7 +6,7 @@
 /*   By: miphigen <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/25 19:32:00 by miphigen          #+#    #+#             */
-/*   Updated: 2020/10/07 17:10:08 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/10/10 20:12:05 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,18 +31,12 @@ void	change_direction(t_map *map, double angle)
 	map->hero_direction = a;
 }
 
-char	move_on(t_map *map, double x, double y, int scale)
+char	mh_move_on(t_map *map, double x, double y, int scale)
 {
 	char c;
 
-	if (y >= map->maze_height * scale || x >= map->maze_width * scale)
-	{
-		y >= map->img2->height - 1 ? y = map->img2->height : 0 ; 
-		x >= map->img2->width - 1 ? x = map->img2->width : 0;
-		return (0);
-	}
 	c = map->maze[(int)floor(y / scale)][(int)floor(x / scale)];
-	if (c == '1' || c == ' ')
+	if (c == '1')
 		return (0);
 	else
 		return (c);
@@ -59,19 +53,19 @@ void	swap_double(double *a, double *b)
 
 void	mh_correct_values(double angle, double *x, double *y)//
 {
-	if (angle > 0 && angle < M_PI)
-		*y = *y * -1;
+//	if (angle > 0 && angle < M_PI)
+//		*y = *y * -1;
 	if (angle > M_PI_2 && angle < M_PI_2 * 3)
 		*x = *x * -1;
 	if (angle == 0 || angle == M_PI)
 	{
 		*x = angle == 0 ? STEP : -STEP;
-		*y = 0;
+//		*y = 0;
 	}
 	else if (angle == M_PI_2 || angle == M_PI_2 * 3)
 	{
 		*x = 0;
-		*y = angle == M_PI_2 ? -STEP : STEP;
+//		*y = angle == M_PI_2 ? -STEP : STEP;
 	}
 }
 
@@ -86,11 +80,11 @@ void	move_hero(t_map *map, double angle)
 	else if (angle >= M_PI * 2)
 		angle -= (M_PI * 2);
 	x = fabs(cos(angle)) * STEP;
-	y = fabs(sin(angle)) * STEP;
+	y = -sin(angle) * STEP;
 	mh_correct_values(angle, &x, &y);
 	x += map->hero_x;
 	y += map->hero_y;
-	if (move_on(map, x, y, map->scale))
+	if (mh_move_on(map, x, y, map->scale))
 	{
 		map->hero_x = x;
 		map->hero_y = y;
@@ -100,7 +94,7 @@ void	move_hero(t_map *map, double angle)
 
 int	process_key(int key, t_map *map)
 {
-	//printf("key = %d direction = %f\n", key, map->hero_direction);
+//	printf("key = %d direction = %f\n", key, map->hero_direction);
 	map->status = 8;
 	if (key == 0 || key == 97)
 		move_hero(map, map->hero_direction + M_PI_2);
@@ -119,6 +113,7 @@ int	process_key(int key, t_map *map)
 	else
 		return (0);
 	draw_3d_image(map);
+	draw_2d_image(map);
 	return (0);
 }
 
@@ -150,6 +145,7 @@ void	render_map(t_map *map)
 	g_win_ptr = mlx_new_window(g_mlx_ptr, map->res_width, map->res_height, "Hello raycaster");
 	new_image(&map->img, map->maze_width * (map->scale / 4), map->maze_height * (map->scale / 4));
 	draw_3d_image(map);
+	draw_2d_image(map);
 //	save_in_bmp(map->img2);
 	mlx_hook(g_win_ptr, 2, 1L<<0, process_key, map);
 	mlx_hook(g_win_ptr, 17, 1L<<17, set_error_and_exit, NULL);

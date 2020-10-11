@@ -6,7 +6,7 @@
 /*   By: miphigen <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/31 19:18:01 by miphigen          #+#    #+#             */
-/*   Updated: 2020/10/06 15:55:25 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/10/10 14:59:50 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ void	draw_012(t_img *img, int x, int y, int scale, int color)
 		while (++j < scale)
 			img_pixel_put(img, x + i, y + j, color);
 	}
-	img_pixel_put(img, x , y, 0);
+//	img_pixel_put(img, x , y, 0);
 
 }
 
@@ -90,6 +90,16 @@ void	draw_line(t_map *map, t_line l, int color)
 	}
 }
 
+char	d2_move_on(t_map *map, double x, double y, int scale)
+{
+	char c;
+
+	c = map->maze[(int)floor(y / scale)][(int)floor(x / scale)];
+	if (c == '1')
+		return (0);
+	else
+		return (c);
+}
 void	create_ray(t_map *map, double angle)
 {
 //	printf("create_ray() angle = %d\n", angle);
@@ -114,7 +124,7 @@ void	create_ray(t_map *map, double angle)
 		x = i;
 		y = tg * x;
 		mh_correct_values(angle, &x, &y);
-		if (!move_on(map, x + map->hero_x / 4, y + map->hero_y / 4, map->scale / 4))
+		if (!d2_move_on(map, x + map->hero_x / 4, y + map->hero_y / 4, map->scale / 4))
 			break ;
 		else
 	 	{
@@ -201,7 +211,7 @@ void	draw_2d_image(t_map *map)
 //		draw_check_pattern(&map->img, i, map->img.height, 'v');
 //		i += scale;
 //	}
-	draw_hero(map, &map->img, (int)map->hero_x / 4, (int)map->hero_y / 4);
-	draw_rays(&map->img, map);
-	put_image_to_window(&map->img, 0, map->res_height / 4 * 3 );
+//	draw_hero(map, &map->img, (int)(map->hero_x / 4) - 1, (int)(map->hero_y / 4) - 1);
+//	draw_rays(&map->img, map);
+	put_image_to_window(&map->img, 0, 0);
 }
