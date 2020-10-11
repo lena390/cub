@@ -6,88 +6,13 @@
 /*   By: miphigen <miphigen@student.21-school.ru>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/12 10:11:05 by miphigen          #+#    #+#             */
-/*   Updated: 2020/10/11 18:50:35 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/10/11 18:59:54 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
 static int dbg = 0;
-
-void	add_sprite(t_map *map, double x_start, double dist, int	flag)
-{
-	double	*tab_new;
-	double	*tab;
-	static int	capacity;
-	static int	size;
-	int 		i;
-
-	map->status = 13;
-	tab = map->sp_location;
-	if (flag == 1)
-	{
-		capacity = 20;
-		size = 0;
-		map->sp_location = malloc(sizeof(double) * 20);
-		tab = map->sp_location;
-		if (!tab) set_error_and_exit("Memory allocation failure", map); 
-		return ;
-	}
-	if (size == capacity)
-	{
-		capacity *= 2;
-		tab_new = malloc(sizeof(double) * capacity);
-		if (!tab_new) set_error_and_exit("Memory allocation failure", map); 
-		i = -1;
-		while (++i < size)
-			tab_new[i] = tab[i];
-		free(tab);
-		map->sp_location = tab_new;
-		tab = tab_new;
-	}
-	tab[size++] = dist;
-	tab[size++] = x_start;
-}
-
-void	put_sprite(t_map *map, t_img *img, int sp_height, int sp_x)
-{
-	int x, y;
-	y = map->res_height * 0.5;
-	while (y < sp_height + map->res_width * 0.5)
-	{
-		x = sp_x;
-		while (x < sp_height + sp_x)
-		{
-			img_pixel_put(img, x, y, 0);
-			x++;
-			
-		}
-		y++;
-	}
-}
-
-void	put_sprites_to_image(t_map *map)
-{
-	int		i0;
-	int		i1;
-	double	sp_width;
-	double	sp_height;
-	double	*tab;
-
-	map->status = 16;
-	tab = map->sp_location;
-	i1 = tab[1];
-	i0 = 2;
-	while (i0 < i1)
-	{
-		//sp_height = ceil((map->scale * map->img2->height) / (4 * (tab[i0])));
-		sp_height = 50;
-		sp_width = 0;//написать что-нибудь
-		put_sprite(map, map->img2, ceil(sp_height), ceil(tab[i0 + 1]));
-		i0 += 2;
-	}
-	free(tab);
-}
 
 char	check_intersect(t_map *map, double x, double y, int scale, double xshift, double yshift)
 {
@@ -147,7 +72,6 @@ void	vertical_cross(t_map *map, t_wall *wall, double angle)
 	}
 	if (dbg) printf("@vertical_cross: crosss x = %f, y = %f\n", x, y);
 	wall->dist = sqrt(pow(x - map->hero_x, 2) + pow(y - map->hero_y, 2));
-//	wall->dist = (map->hero_x - x)/cos(angle);
 	if (angle >= M_PI_2 && angle < M_PI_2 * 3)
 		wall->type = 'W';
 	else
@@ -172,10 +96,6 @@ void	horizontal_cross(t_map *map, t_wall *wall, double angle)
 	}
 	x = (y / tg) + map->hero_x - (map->hero_y / tg);
 	double step_x = step / tg;//
-/*	if (angle >= M_PI_2 && angle < M_PI_2 * 3 && step_x > 0)//
-		step_x * -1;//
-	else
-		step_x < 0 ? step_x *= -1 : 0;*/
 	if (dbg) printf("@horizontal_cross: initial x = %f, y = %f, step = %f, step_x = %f\n", x, y, step, step_x);
 	while (y < map->img2->height)
 	{
@@ -188,7 +108,6 @@ void	horizontal_cross(t_map *map, t_wall *wall, double angle)
 	}
 	if (dbg) printf("@horizontal_cross: crosss x = %f, y = %f\n", x, y);
 	wall->dist = sqrt(pow(x - map->hero_x, 2) + pow(y - map->hero_y, 2));
-//	wall->dist = (map->hero_x - x)/cos(angle);
 if (angle >= 0 && angle < M_PI)
 		wall->type = 'N';
 	else
@@ -205,11 +124,6 @@ t_wall	get_wall_inf_and_collect_sprite_loc(t_map *map, double angle, double next
 		angle += (M_PI) * 2;
 	else if (angle >= M_PI * 2)
 		angle -= (M_PI * 2);
-//	if (angle == 0  || angle == M_PI_2 || angle == M_PI || angle == M_PI_2 * 3)
-//	{	
-//		angle += next;
-//		printf("get_wall_inf() angle == %f\n", angle);
-//	}
 	horizontal_cross(map, &wall1, angle);
 	vertical_cross(map, &wall2, angle);
 	if (dbg) printf("wall1 dist: %f. wall2 dist: %f\n", wall1.dist, wall2.dist);
@@ -274,9 +188,6 @@ void	draw_3d_image(t_map *map)
 	int		rays_number;
 	int		i;
 	double f = M_PI / 180;
-//	printf("direction %f location %f %f\n", map->hero_direction / f, map->hero_x, map->hero_y);
-//	puts("new image");
-//	printf("%f %f\n", map->hero_x, map->hero_y);
 	map->status = 11;
 	new_image(map->img2, map->res_width, map->res_height);
 	rays_number = map->img2->width / PPR;

@@ -6,7 +6,7 @@
 /*   By: miphigen <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/16 00:30:20 by miphigen          #+#    #+#             */
-/*   Updated: 2020/10/11 18:51:21 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/10/11 19:00:19 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,5 +74,8 @@ void			swap_double(double *a, double *b);
 void			mh_correct_values(double angle, double *x, double *y);
 void			print_info(t_map *map);//
 void			print_2d(char *s, char **array);//
+void			add_sprite(t_map *map, double x_start, double dist, int	flag);
+void			put_sprites_to_image(t_map *map);
+
 
 #endif
