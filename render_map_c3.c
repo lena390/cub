@@ -6,7 +6,7 @@
 /*   By: miphigen <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/25 19:32:00 by miphigen          #+#    #+#             */
-/*   Updated: 2020/10/10 20:12:05 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/10/14 15:29:17 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,12 @@
 
 //int	mlx_pixel_put(void *mlx_ptr, void *win_ptr, int x, int y, int color);
 
-void	change_direction(t_map *map, double angle)
+void	change_direction(double angle)
 {
 	double a;
 
-	map->status = 10;
-	a = map->hero_direction;
+	g_map->status = 10;
+	a = g_map->hero_direction;
 	a += angle;
 
 	if (a >= M_PI * 2)
@@ -28,14 +28,14 @@ void	change_direction(t_map *map, double angle)
 		a += (M_PI * 2);
 	if (a == M_PI_2 || a == M_PI_2 * 3)
 		a += (ROTATION_SPEED * 0.75);
-	map->hero_direction = a;
+	g_map->hero_direction = a;
 }
 
-char	mh_move_on(t_map *map, double x, double y, int scale)
+char	mh_move_on(double x, double y, int scale)
 {
 	char c;
 
-	c = map->maze[(int)floor(y / scale)][(int)floor(x / scale)];
+	c = g_map->maze[(int)floor(y / scale)][(int)floor(x / scale)];
 	if (c == '1')
 		return (0);
 	else
@@ -69,12 +69,12 @@ void	mh_correct_values(double angle, double *x, double *y)//
 	}
 }
 
-void	move_hero(t_map *map, double angle)
+void	move_hero(double angle)
 {
 	double	x;
 	double	y;
 
-	map->status = 9;
+	g_map->status = 9;
 	if (angle < 0)
 		angle += (M_PI) * 2;
 	else if (angle >= M_PI * 2)
@@ -82,72 +82,73 @@ void	move_hero(t_map *map, double angle)
 	x = fabs(cos(angle)) * STEP;
 	y = -sin(angle) * STEP;
 	mh_correct_values(angle, &x, &y);
-	x += map->hero_x;
-	y += map->hero_y;
-	if (mh_move_on(map, x, y, map->scale))
+	x += g_map->hero_x;
+	y += g_map->hero_y;
+	if (mh_move_on(x, y, g_map->scale))
 	{
-		map->hero_x = x;
-		map->hero_y = y;
+		g_map->hero_x = x;
+		g_map->hero_y = y;
 	}
 //	printf("hero_new_location: %f %f\n", x, y);
 }
 
-int	process_key(int key, t_map *map)
+int	process_key(int key)
 {
-//	printf("key = %d direction = %f\n", key, map->hero_direction);
-	map->status = 8;
+//	printf("key = %d direction = %f\n", key, g_map->hero_direction);
+	g_map->status = 8;
 	if (key == 0 || key == 97)
-		move_hero(map, map->hero_direction + M_PI_2);
+		move_hero(g_map->hero_direction + M_PI_2);
 	else if (key == 1 || key == 115 || key == 65364)
-		move_hero(map, map->hero_direction + M_PI);
+		move_hero(g_map->hero_direction + M_PI);
 	else if (key == 2 || key == 100)
-		move_hero(map, map->hero_direction - M_PI_2);
+		move_hero(g_map->hero_direction - M_PI_2);
 	else if (key == 13 || key == 119 || key == 65362)
-		move_hero(map, map->hero_direction);
+		move_hero(g_map->hero_direction);
 	else if (key == 123 || key == 65361)
-		change_direction(map, ROTATION_SPEED);
+		change_direction(ROTATION_SPEED);
 	else if (key == 124 || key == 65363)
-		change_direction(map, -ROTATION_SPEED);
+		change_direction(-ROTATION_SPEED);
 	else if (key == 65307)
-		set_error_and_exit(NULL, map);
+		set_error_and_exit(NULL);
 	else
 		return (0);
-	draw_3d_image(map);
-	draw_2d_image(map);
+	draw_3d_image();
+	draw_2d_image();
 	return (0);
 }
 
-void	set_new_coordinates(t_map *map)
+void	set_new_coordinates()
 {
-	map->scale = map->res_width/map->maze_width < map->res_height/map->maze_height ?
-				map->res_width/map->maze_width : map->res_height/map->maze_height;	
-	map->hero_x *= map->scale;
-	map->hero_y *= map->scale;
+	g_map->scale = g_map->res_width/g_map->maze_width < g_map->res_height/g_map->maze_height ?
+				g_map->res_width/g_map->maze_width : g_map->res_height/g_map->maze_height;	
+	g_map->hero_x *= g_map->scale;
+	g_map->hero_y *= g_map->scale;
 
 }
 
-void	check_resolution(t_map *map)
+void	check_resolution()
 {
 	int		x_screen_size;
 	int		y_screen_size;
 	
 	mlx_get_screen_size(g_mlx_ptr, &x_screen_size, &y_screen_size);
-	map->res_width = map->res_width > x_screen_size ? x_screen_size : map->res_width;
-	map->res_height = map->res_height > y_screen_size ? y_screen_size : map->res_height;	
+	g_map->res_width = g_map->res_width > x_screen_size ? x_screen_size : g_map->res_width;
+	g_map->res_height = g_map->res_height > y_screen_size ? y_screen_size : g_map->res_height;	
 }
 
-void	render_map(t_map *map)
+void	render_map()
 {
-	map->status = 7;
+	g_map->status = 7;
 	g_mlx_ptr = mlx_init();
-	check_resolution(map);
-	set_new_coordinates(map);	
-	g_win_ptr = mlx_new_window(g_mlx_ptr, map->res_width, map->res_height, "Hello raycaster");
-	new_image(&map->img, map->maze_width * (map->scale / 4), map->maze_height * (map->scale / 4));
-	draw_3d_image(map);
-	draw_2d_image(map);
-//	save_in_bmp(map->img2);
-	mlx_hook(g_win_ptr, 2, 1L<<0, process_key, map);
+	check_resolution();
+	set_new_coordinates();	
+	g_win_ptr = mlx_new_window(g_mlx_ptr, g_map->res_width, g_map->res_height, "Hello raycaster");
+	new_image(&g_map->img, g_map->maze_width * (g_map->scale / 4), g_map->maze_height * (g_map->scale / 4));
+	dl_textures();
+	draw_3d_image();
+	draw_2d_image();
+//	save_in_bmp(g_map->img2);
+	mlx_hook(g_win_ptr, 2, 1L<<0, process_key, NULL);
 	mlx_hook(g_win_ptr, 17, 1L<<17, set_error_and_exit, NULL);
 	mlx_loop(g_mlx_ptr);
 }

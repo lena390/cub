@@ -6,7 +6,7 @@
 /*   By: miphigen <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/16 00:30:20 by miphigen          #+#    #+#             */
-/*   Updated: 2020/10/11 19:00:19 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/10/14 18:36:47 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,13 +21,18 @@
 # define MLX_SYNC_WIN_CMD_COMPLETED 3
 
 # define ANGLE_OV M_PI / 3
-# define STEP 5 
+# define STEP 10 
 # define ROTATION_SPEED M_PI / 90 
-# define PPR 1
+# define PPR 1 //не менять
+
 typedef struct	s_wall_info
 {
 	double		dist;
 	char		type;
+	double		x;
+	double		y;
+
+	double		height;
 }				t_wall;
 
 typedef struct	s_map_info
@@ -58,24 +63,37 @@ typedef struct	s_map_info
 	t_img		img;
 	t_img		*img2;
 	double		*sp_location;
+
+	t_img		*NO;
+	t_img		*WE;
+	t_img		*SO;
+	t_img		*EA;
+	t_img		*texture_ptr;
+	t_img		*previous_texture_ptr;
+	int			column_number;
+	int			column_counter;
 }				t_map;
 
-void	 		parse_map(t_map *map, int fd);
-void			parse_maze(t_map *map, int fd, char *str);
-void			maze_is_valid(t_map *map);
-void			render_map(t_map *map);
-void			draw_2d_image(t_map *map);
-void			draw_3d_image(t_map *map);
-double			get_ray_length(t_map *map, double x, double y, double angle);
+t_map			*g_map;
+
+void	 		parse_map(int fd);
+void			parse_maze(int fd, char *str);
+void			maze_is_valid();
+void			render_map();
+void			draw_2d_image();
+void			draw_3d_image();
+double			get_ray_length(double x, double y, double angle);
 void			save_in_bmp(t_img *img);
-int				set_error_and_exit(char *msg, t_map *map);
+int				set_error_and_exit(char *msg);
 void			free_2d_array(char **s, int size);
 void			swap_double(double *a, double *b);
 void			mh_correct_values(double angle, double *x, double *y);
-void			print_info(t_map *map);//
+void			print_info();//
 void			print_2d(char *s, char **array);//
-void			add_sprite(t_map *map, double x_start, double dist, int	flag);
-void			put_sprites_to_image(t_map *map);
-
+void			add_sprite(double x_start, double dist, int	flag);
+void			put_sprites_to_image();
+void			apply_texture(int x0, int x1, t_wall *wall);
+void			dl_textures();
+void			*ft_malloc(size_t size);
 
 #endif

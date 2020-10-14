@@ -6,7 +6,7 @@
 /*   By: miphigen <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/21 16:24:19 by miphigen          #+#    #+#             */
-/*   Updated: 2020/09/27 17:08:47 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/10/14 15:19:05 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,14 +27,14 @@ int		get_max_width(char **array)
 	return (max);
 }
 
-void	set_hero(t_map *map, char c, double x, double y)
+void	set_hero(char c, double x, double y)
 {
-	map->hero_x = y;
-	map->hero_y = x;
-	c == 'E' ? map->hero_direction = 0 : 0; 
-	c == 'N' ? map->hero_direction = M_PI_2 : 0;
-	c == 'W' ? map->hero_direction = M_PI : 0;
-	c == 'S' ? map->hero_direction = M_PI + M_PI_2 : 0;
+	g_map->hero_x = y;
+	g_map->hero_y = x;
+	c == 'E' ? g_map->hero_direction = 0 : 0; 
+	c == 'N' ? g_map->hero_direction = M_PI_2 : 0;
+	c == 'W' ? g_map->hero_direction = M_PI : 0;
+	c == 'S' ? g_map->hero_direction = M_PI + M_PI_2 : 0;
 }
 
 int		check_line(char *s)
@@ -44,7 +44,7 @@ int		check_line(char *s)
 	return (*s == '\0' ? 1 : 0);
 }
 
-int		is_valid_hor(char **array, t_map *map)
+int		is_valid_hor(char **array)
 {
 	int		ret_value;
 	char	c;
@@ -52,7 +52,7 @@ int		is_valid_hor(char **array, t_map *map)
 	char	*s;
 	int		i;
 
-	map->status = 5;
+	g_map->status = 5;
 	set = "012 NSWE";
 	ret_value = 1;
 	s = array[0];
@@ -73,7 +73,7 @@ int		is_valid_hor(char **array, t_map *map)
 			{
 				if (c != '1' && c != '0' && c != '2')
 					ret_value = 0;
-				set_hero(map, *s, i, s - array[i]);
+				set_hero(*s, i, s - array[i]);
 				set = "012 ";
 				*s = '0';
 			}
@@ -81,11 +81,11 @@ int		is_valid_hor(char **array, t_map *map)
 		}
 		i++;
 	}
-	ret_value = map->hero_direction == -1 ? 0 : ret_value;
+	ret_value = g_map->hero_direction == -1 ? 0 : ret_value;
 	return (ret_value & (check_line(array[i - 1]) & (check_line(array[0]))));
 }
 
-int		is_valid_vert(char **array, t_map *map)
+int		is_valid_vert(char **array)
 {
 	int		ret_value;
 	int		i;
@@ -93,15 +93,15 @@ int		is_valid_vert(char **array, t_map *map)
 	char	c1;
 	char	c2;
 
-	map->status = 6;
+	g_map->status = 6;
 	i = 0;
-	while (i < map->maze_height && (array[i][0] == ' ' || array[i][0] == '1'))
+	while (i < g_map->maze_height && (array[i][0] == ' ' || array[i][0] == '1'))
 		i++;
-	ret_value = i == map->maze_height ? 1 : 0;
-	while (i < map->maze_width && ret_value == 1)
+	ret_value = i == g_map->maze_height ? 1 : 0;
+	while (i < g_map->maze_width && ret_value == 1)
 	{
 		j = 0;
-		while (j < map->maze_height - 1 && ret_value == 1)
+		while (j < g_map->maze_height - 1 && ret_value == 1)
 		{	
 			c1 = array[j][i];
 			c2 = array[++j][i];
@@ -170,18 +170,18 @@ char	**add_spaces(char **array, int width, int *height)
 	return (maze);
 }
 
-void	maze_is_valid(t_map *map)
+void	maze_is_valid()
 {
 	char	**ptr;
 
-	map->status = 4;
-	map->maze_width = get_max_width(map->maze);
-	if ((ptr = add_spaces(map->maze, map->maze_width, &map->maze_height)) != NULL)
+	g_map->status = 4;
+	g_map->maze_width = get_max_width(g_map->maze);
+	if ((ptr = add_spaces(g_map->maze, g_map->maze_width, &g_map->maze_height)) != NULL)
 	{
-		map->maze = ptr;
-		is_valid_hor(map->maze, map) && is_valid_vert(map->maze, map) ? 0 :
-			set_error_and_exit("Invalid maze", map);
+		g_map->maze = ptr;
+		is_valid_hor(g_map->maze) && is_valid_vert(g_map->maze) ? 0 :
+			set_error_and_exit("Invalid maze");
 	}
 	else
-		set_error_and_exit("Memory allocation failure", map);
+		set_error_and_exit("Memory allocation failure");
 }
