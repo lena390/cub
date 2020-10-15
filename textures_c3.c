@@ -6,7 +6,7 @@
 /*   By: miphigen <miphigen@student.21-school.ru>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/11 19:17:14 by miphigen          #+#    #+#             */
-/*   Updated: 2020/10/15 10:59:44 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/10/15 14:14:51 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,10 +85,10 @@ void	apply_texture(int x, int delete_later, t_wall *wall)
 	scale_y = floor(wall->height / wall->texture_ptr->height);
 	y = -1;
 	int i = -1;
-	while (++i <= wall->height)
+	while (++i < wall->height)
 	{
 		int xx = g_map->column_number * wall->texture_ptr->bits_per_pixel / 8;
-		int yy = round((double)i / wall->actual_height * wall->texture_ptr->height) * wall->texture_ptr->size_line;
+		int yy = floor((double)(i + (wall->actual_height - wall->height)/2) / wall->actual_height * wall->texture_ptr->height) * wall->texture_ptr->size_line;
 		void *ptr = wall->texture_ptr->addr + xx + yy;
 //		printf("%p, i = %d xx = %d yy = %d x = %d y = %d pixel = %x\n", ptr, i, xx, yy, x, y_start, *(unsigned int*)ptr);
 //		printf("%p, i = %d xx = %d yy = %d x = %d y = %d pixel = %x\n", ptr, i, xx, yy, x, y_start, *(unsigned int*)ptr);
