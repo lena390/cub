@@ -6,7 +6,7 @@
 /*   By: miphigen <miphigen@student.21-school.ru>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/11 19:17:14 by miphigen          #+#    #+#             */
-/*   Updated: 2020/10/15 14:14:51 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/10/15 17:28:54 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,31 +34,20 @@ void	dl_textures()
 	g_map->WE = get_texture(g_map->path_WE);
 }
 
-double	west_east_texture(t_wall *wall)
+double		get_column_number(t_wall *wall)
 {
 	double i =  wall->y / g_map->scale;
 	while (i > 1)
 		i -= 1.;
-	return i * wall->texture_ptr->width;
-}
-double	north_south_texture(t_wall *wall)
-{
-	int x0;
-	int x1;
-	int	y;
-
-	double i =  wall->x / g_map->scale;
-	while (i > 1)
-		i -= 1.;
-	return i * wall->texture_ptr->width;
-}
-
-double		get_column_number(t_wall *wall)
-{
-	double coeff;
-
+	i = i * wall->texture_ptr->width;
+	
+	double j =  wall->x / g_map->scale;
+	while (j > 1)
+		j -= 1.;
+	j = j * wall->texture_ptr->width;
+	
 	return (wall->type == 'S' || wall->type == 'N' ?
-		north_south_texture(wall) : west_east_texture(wall));
+		j : i);
 }
 
 void	apply_texture(int x, int delete_later, t_wall *wall)
@@ -88,33 +77,11 @@ void	apply_texture(int x, int delete_later, t_wall *wall)
 	while (++i < wall->height)
 	{
 		int xx = g_map->column_number * wall->texture_ptr->bits_per_pixel / 8;
-		int yy = floor((double)(i + (wall->actual_height - wall->height)/2) / wall->actual_height * wall->texture_ptr->height) * wall->texture_ptr->size_line;
+		int yy = floor((double)(i + (wall->actual_height - wall->height)/2) / wall->actual_height * wall->texture_ptr->height) * wall->texture_ptr->size_line;//
 		void *ptr = wall->texture_ptr->addr + xx + yy;
-//		printf("%p, i = %d xx = %d yy = %d x = %d y = %d pixel = %x\n", ptr, i, xx, yy, x, y_start, *(unsigned int*)ptr);
-//		printf("%p, i = %d xx = %d yy = %d x = %d y = %d pixel = %x\n", ptr, i, xx, yy, x, y_start, *(unsigned int*)ptr);
+	//	printf("%p, i = %d xx = %d yy = %d x = %d y = %d pixel = %x\n", ptr, i, xx, yy, x, y_start, *(unsigned int*)ptr);
 		img_pixel_put(g_map->img2, x, i + y_start, *(unsigned int *)ptr);
 	}
-
-/*	
-	j = -1;
-	while (++j < wall->texture_ptr->height)
-	{
-		int xx = g_map->column_number * wall->texture_ptr->bits_per_pixel / 8;
-		int yy = j * wall->texture_ptr->size_line;
-		void *ptr = wall->texture_ptr->addr + xx + yy;
-		printf("%p, i = %d xx = %d yy = %d x = %d y = %d pixel = %x\n", ptr, j, xx, yy, x, y_start, *(unsigned int*)ptr);
-		int k = -1;
-		while (++k < scale_y && y_start < y_end)
-		{
-			img_pixel_put(g_map->img2, x, y_start++, *(unsigned int *)ptr);
-			int piska = (wall->height - (scale_y * wall->texture_ptr->height));
-			int	a = wall->height / piska;
-			if (k % a == 0)
-				img_pixel_put(g_map->img2, x, y_start++, *(unsigned int *)ptr);	
-		}
-	}
-*/
-
 	g_map->previous_texture_ptr = wall->texture_ptr;
 	if (++g_map->column_counter >= scale_y)
 	{	
@@ -123,5 +90,3 @@ void	apply_texture(int x, int delete_later, t_wall *wall)
 	}
 	free(wall);
 }
-//	ptr = img->addr + (x * img->bits_per_pixel / 8) + (y * img->size_line);
-//unsigned int	mlx_get_color_value(void *mlx_ptr, int color);

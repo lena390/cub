@@ -6,7 +6,7 @@
 /*   By: miphigen <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/25 19:32:00 by miphigen          #+#    #+#             */
-/*   Updated: 2020/10/14 15:29:17 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/10/15 21:29:46 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,12 +142,13 @@ void	render_map()
 	g_mlx_ptr = mlx_init();
 	check_resolution();
 	set_new_coordinates();	
-	g_win_ptr = mlx_new_window(g_mlx_ptr, g_map->res_width, g_map->res_height, "Hello raycaster");
+	if (g_map->screenshot_needed == 0)
+		g_win_ptr = mlx_new_window(g_mlx_ptr, g_map->res_width, g_map->res_height, "Hello raycaster");
 	new_image(&g_map->img, g_map->maze_width * (g_map->scale / 4), g_map->maze_height * (g_map->scale / 4));
 	dl_textures();
 	draw_3d_image();
-	draw_2d_image();
-//	save_in_bmp(g_map->img2);
+	if (g_map->screenshot_needed == 0)
+		draw_2d_image();
 	mlx_hook(g_win_ptr, 2, 1L<<0, process_key, NULL);
 	mlx_hook(g_win_ptr, 17, 1L<<17, set_error_and_exit, NULL);
 	mlx_loop(g_mlx_ptr);

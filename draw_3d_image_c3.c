@@ -6,7 +6,7 @@
 /*   By: miphigen <miphigen@student.21-school.ru>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/12 10:11:05 by miphigen          #+#    #+#             */
-/*   Updated: 2020/10/15 11:01:25 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/10/15 21:28:55 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,12 +40,7 @@ char	check_intersect(double x, double y, int scale, double xshift, double yshift
 	c = g_map->maze[y_coord][x_coord];
 	if (c == '1' || c == ' ')
 		return ('1');
-	return (0);
-}
-
-void	get_int_for_textures(t_wall *wall, double x, double angle)
-{
-	
+	return (c);
 }
 
 void	vertical_cross(t_wall *wall, double angle)
@@ -70,10 +65,11 @@ void	vertical_cross(t_wall *wall, double angle)
 	{
 		x += step;
 		y += step_y;
-		wall->type = check_intersect(x, y, g_map->scale, 0.5, 0.5);
-		if (wall->type == '1')
+		wall->number = check_intersect(x, y, g_map->scale, 0.5, 0.5);
+		if (wall->number == '1')
 			break;
-		if (wall->type == '2');//add sprite
+		if (wall->number == '2')
+			add_item(x, y, angle, 0);
 	}
 	wall->x = x;
 	wall->y = y;
@@ -108,10 +104,11 @@ void	horizontal_cross(t_wall *wall, double angle)
 	{
 		y += step;
 		x += step_x;
-		wall->type = check_intersect(x, y, g_map->scale, 0.5, 0.5);
-		if (wall->type == '1')
+		wall->number = check_intersect(x, y, g_map->scale, 0.5, 0.5);
+		if (wall->number == '1')
 			break;
-		if (wall->type == '2');//add sprite
+		if (wall->number == '2')//add sprite
+			add_item(x, y, angle, 0);
 	}
 	wall->x = x;
 	wall->y = y;
@@ -177,12 +174,6 @@ void	draw_section(int x0, int x1, t_wall *wall)
 			img_pixel_put(g_map->img2, x0, i, g_map->ceil);
 			img_pixel_put(g_map->img2, x0, g_map->img2->height - i, g_map->floor);
 		}
-		i = -1;
-		while (++i < wall->height / 2 - 1)
-		{
-			img_pixel_put(g_map->img2, x0, y_skyline + i + 1, color_wall);
-			img_pixel_put(g_map->img2, x0, y_skyline - i, color_wall);
-		}
 		x0++;
 	apply_texture(x0 - 1, x1, wall);
 	}
@@ -202,7 +193,7 @@ void	draw_3d_image()
 	g_map->section_width = g_map->img2->width / rays_number;
 	r_min = (g_map->hero_direction - ANGLE_OV / 2);
 	r_max = (g_map->hero_direction + ANGLE_OV / 2);
-//	add_sprite(0, 0, 1);
+	add_item(0, 0, 0, 1);
 	i = 0;
 	if (dbg) printf("================================\n");
 	while (i < g_map->img2->width)
@@ -213,9 +204,11 @@ void	draw_3d_image()
 		i += g_map->section_width;
 		r_max -= (M_PI / 3) / rays_number;
 	}
-//	apply_texture(g_map, img22);
-	//2put_sprites_to_image(g_map);
-	put_image_to_window(g_map->img2, 0, 0);
+//	put_items_to_image();
+	if (g_map->screenshot_needed == 0)
+		put_image_to_window(g_map->img2, 0, 0);
+	else
+		save_in_bmp(g_map->img2);
 	mlx_destroy_image(g_mlx_ptr, g_map->img2->ptr);
 
 }

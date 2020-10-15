@@ -6,7 +6,7 @@
 /*   By: miphigen <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/31 19:18:01 by miphigen          #+#    #+#             */
-/*   Updated: 2020/10/14 15:06:44 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/10/15 19:48:06 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,9 +83,9 @@ void	draw_line(t_line l, int color)
 		t = (x - l.x0) / (float)(l.x1 - 0);
 		y = l.y0 * (1.0 - t) + l.y1 * t;
 		if (l.steep)
-			img_pixel_put(g_map->img2, y, x, color);
+			img_pixel_put(&g_map->img, y, x, color);
 		else
-			img_pixel_put(g_map->img2, x, y, color);
+			img_pixel_put(&g_map->img, x, y, color);
 		x++;
 	}
 }
@@ -94,7 +94,7 @@ char	d2_move_on(double x, double y, int scale)
 {
 	char c;
 
-	c = g_map->maze[(int)floor(y / scale)][(int)floor(x / scale)];
+	c = g_map->maze[(int)(y / scale)][(int)(x /  g_map->img.height / g_map->maze_height)];
 	if (c == '1')
 		return (0);
 	else
@@ -102,7 +102,6 @@ char	d2_move_on(double x, double y, int scale)
 }
 void	create_ray(double angle)
 {
-//	printf("create_ray() angle = %d\n", angle);
 	double	x1;
 	double	y1;
 	double	x;
@@ -124,7 +123,7 @@ void	create_ray(double angle)
 		x = i;
 		y = tg * x;
 		mh_correct_values(angle, &x, &y);
-		if (!d2_move_on(x + g_map->hero_x / 4, y + g_map->hero_y / 4, g_map->scale / 4))
+		if (!d2_move_on(x + g_map->hero_x / 4, y + g_map->hero_y / 4, g_map->img.width / g_map->maze_width))
 			break ;
 		else
 	 	{
@@ -150,10 +149,17 @@ void	draw_rays(t_img *img)
 	}
 }
 
-void	draw_hero(t_img *img, int hero_x, int hero_y)
+void	draw_hero(t_img *img, double hero_x, double hero_y)
 {
-	img_pixel_put(g_map->img2, hero_y / g_map->scale, hero_x / g_map->scale, 0xff0000);
-
+	int x = (int)(hero_x / 4);
+	int y = (int)(hero_y / 4);
+	int i = -1;
+	while (++i < 5)
+	{
+		int j = -1;
+		while (++j < 5)
+			img_pixel_put(img, x + i, y + j, 0);			
+	}
 }
 
 void	draw_check_pattern(t_img *img, int i, int length, char c)
@@ -199,19 +205,6 @@ void	draw_2d_image()
 				draw_012(&g_map->img, j, i, scale, 0xfffffff);
 		}
 	}
-//	i = scale;
-//	while (i < g_map->img.height)
-//	{	
-//		draw_check_pattern(&g_map->img, i, g_map->img.width, 'h');
-//		i += scale;
-//	}
-//	i = scale;
-//	while (i < g_map->img.width)
-//	{	
-//		draw_check_pattern(&g_map->img, i, g_map->img.height, 'v');
-//		i += scale;
-//	}
-//	draw_hero(g_map, &g_map->img, (int)(g_map->hero_x) - 1, (int)(g_map->hero_y / 4) - 1);
-//	draw_rays(&g_map->img, g_map);
+	draw_hero(&g_map->img, g_map->hero_x, g_map->hero_y);
 	put_image_to_window(&g_map->img, 0, 0);
 }

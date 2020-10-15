@@ -6,7 +6,7 @@
 /*   By: miphigen <miphigen@student.21-school.ru>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/17 13:47:04 by miphigen          #+#    #+#             */
-/*   Updated: 2020/09/19 18:40:41 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/10/15 21:36:56 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,8 @@ typedef struct tagRGBQUAD
 
  void	save_in_bmp(t_img *img)
 {
-	puts("save_in_bmp()");
+	puts("saving in bmp...(no)");
+	exit(0) ;
 
 }
 

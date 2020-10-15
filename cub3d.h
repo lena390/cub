@@ -6,7 +6,7 @@
 /*   By: miphigen <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/16 00:30:20 by miphigen          #+#    #+#             */
-/*   Updated: 2020/10/15 07:23:06 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/10/15 16:22:26 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@ typedef struct	s_wall_info
 	double		height;
 	double		actual_height;
 	t_img		*texture_ptr;
+	char		number;
 }				t_wall;
 
 typedef struct	s_map_info
@@ -92,8 +93,8 @@ void			swap_double(double *a, double *b);
 void			mh_correct_values(double angle, double *x, double *y);
 void			print_info();//
 void			print_2d(char *s, char **array);//
-void			add_sprite(double x_start, double dist, int	flag);
-void			put_sprites_to_image();
+void			add_item(double x, double y, double angle, int	flag);
+void			put_items_to_image();
 void			apply_texture(int x0, int x1, t_wall *wall);
 void			dl_textures();
 void			*ft_malloc(size_t size);
