@@ -6,7 +6,7 @@
 /*   By: miphigen <miphigen@student.21-school.ru>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/12 10:11:05 by miphigen          #+#    #+#             */
-/*   Updated: 2020/10/15 07:25:31 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/10/15 11:01:25 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -153,13 +153,13 @@ void	draw_section(int x0, int x1, t_wall *wall)
 {
 	t_img			*img;
 	int				i;
-	unsigned int	wall_h;
 	int				y_skyline;
-int	color_wall;
+	int	color_wall;
+	
 	g_map->status = 15;
-	wall->height = ceil((g_map->scale * g_map->img2->height) / (wall->dist * 0.7));
-	wall->height >= g_map->img2->height? wall->height = g_map->img2->height : 0;
-	wall->height < 64 ? wall_h = 64 : 0;
+	wall->actual_height = ceil((g_map->scale * g_map->img2->height) / (wall->dist * 0.7));
+	wall->height = wall->actual_height > g_map->img2->height? g_map->img2->height : wall->actual_height;
+	wall->height < 64 ? wall->height = 64 : 0;
 	y_skyline = g_map->img2->height / 2;	
 	if (wall->type == 'N')
 		color_wall = 0x40d2ff;
