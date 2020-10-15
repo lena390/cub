@@ -6,7 +6,7 @@
 /*   By: miphigen <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/26 17:59:11 by miphigen          #+#    #+#             */
-/*   Updated: 2020/10/10 14:50:27 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/10/15 07:10:53 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,9 +27,9 @@ void	img_pixel_put(t_img *img, int x, int y, int color)
 {
 	void	*ptr;
 
-	if (x >= img->width)
+	if (x > img->width)
 		ft_printf("x value is bigger than img.width value (%d and %d)\n", x, img->width);
-	if (y >= img->height)
+	if (y > img->height)
 		ft_printf("y value is bigger than img.height value (%d and %d)\n", y, img->height);
 	ptr = img->addr + (x * img->bits_per_pixel / 8) + (y * img->size_line);
 	*(unsigned int *)ptr = color;

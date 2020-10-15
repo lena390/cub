@@ -6,7 +6,7 @@
 /*   By: miphigen <miphigen@student.21-school.ru>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/12 10:11:05 by miphigen          #+#    #+#             */
-/*   Updated: 2020/10/14 18:39:51 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/10/15 07:25:31 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -184,8 +184,8 @@ int	color_wall;
 			img_pixel_put(g_map->img2, x0, y_skyline - i, color_wall);
 		}
 		x0++;
-	}
 	apply_texture(x0 - 1, x1, wall);
+	}
 	if (dbg) printf("dist: %f wall->height: %f\n", wall->dist, wall->height);
 }
 

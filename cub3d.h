@@ -6,7 +6,7 @@
 /*   By: miphigen <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/16 00:30:20 by miphigen          #+#    #+#             */
-/*   Updated: 2020/10/14 18:36:47 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/10/15 07:23:06 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,8 @@ typedef struct	s_wall_info
 	double		y;
 
 	double		height;
+	double		actual_height;
+	t_img		*texture_ptr;
 }				t_wall;
 
 typedef struct	s_map_info
