@@ -6,7 +6,7 @@
 /*   By: miphigen <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/16 00:30:20 by miphigen          #+#    #+#             */
-/*   Updated: 2020/10/15 16:22:26 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/10/17 11:10:16 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,13 @@ typedef struct	s_wall_info
 	char		number;
 }				t_wall;
 
+typedef struct	s_items
+{
+	double		x;
+	double		dist;
+	int			size;
+}				t_items;
+
 typedef struct	s_map_info
 {
 	int			screenshot_needed;
@@ -65,7 +72,7 @@ typedef struct	s_map_info
 	int			section_width;
 	t_img		img;
 	t_img		*img2;
-	double		*sp_location;
+	t_items		*items;
 
 	t_img		*NO;
 	t_img		*WE;

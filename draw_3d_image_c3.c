@@ -6,7 +6,7 @@
 /*   By: miphigen <miphigen@student.21-school.ru>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/12 10:11:05 by miphigen          #+#    #+#             */
-/*   Updated: 2020/10/15 21:28:55 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/10/17 23:15:36 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -204,7 +204,7 @@ void	draw_3d_image()
 		i += g_map->section_width;
 		r_max -= (M_PI / 3) / rays_number;
 	}
-//	put_items_to_image();
+	put_items_to_image();
 	if (g_map->screenshot_needed == 0)
 		put_image_to_window(g_map->img2, 0, 0);
 	else

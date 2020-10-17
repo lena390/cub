@@ -4,82 +4,87 @@
 /*   save_bmp_c3.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: miphigen <miphigen@student.21-school.ru>   +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
+/*                                               ; +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/17 13:47:04 by miphigen          #+#    #+#             */
-/*   Updated: 2020/10/15 21:36:56 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/10/17 23:11:49 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
-
-typedef struct tagBITMAPFILEHEADER
+#include "stdint.h"
+//# pragma pach(1)
+typedef struct	s_bmp_file_header
 {
-	short			bfType;//0x4d42
-	unsigned int	bfSize;//bfh.bfOffBits + sizeof(color) * Width * Height + Height * ((sizeof(color) * Width) % 4);
-	short			bfReserved1;//0
-	short		    bfReserved2;//0
-	unsigned int	bfOffBits;//sizeof(bfh) + sizeof(bih) + 1024(palette)
-}	bmp_file_header;
+	int16_t		type;
+	uint16_t	size1;
+	uint16_t	size2;
+	int16_t		reserved1;
+	int16_t		reserved2;
+	uint16_t	off_bits1;
+	uint16_t	off_bits2;
+}				t_bmp_file_header;
 
-typedef struct tagBITMAPINFOHEADER
+typedef struct	s_bmp_info_header
 {
-	unsigned int	biSize;//sizeof(bih)
-	signed int		biWidth;//ширина картинки
-	signed int  	biHeight;//высота картинки
-	short			biPlanes;//1
-	short			biBitCount;//колво бит на пиксель 24/32
-	unsigned int	biCompression;//BI_RGB
-	unsigned int	biSizeImage;//0
-	signed int		biXPelsPerMeter;//
-	signed int		biYPelsPerMeter;//
-	unsigned int	biClrUsed;//0
-	unsigned int	biClrImportant;//0
-}	bmp_info_header;
+	uint32_t	size;
+	int32_t		width;
+	int32_t		height;
+	uint16_t	planes;
+	uint16_t	bit_count;
+	uint32_t	compression;
+	uint32_t	size_image;
+	int32_t		x_pels_per_meter;
+	int32_t		y_pels_per_meter;
+	uint32_t	clr_used;
+	uint32_t	clr_important;
+}				t_bmp_info_header;
 
-typedef struct tagRGBQUAD
+t_bmp_file_header	get_bfh()
 {
-	unsigned char    rgbBlue;
-	unsigned char    rgbGreen;
-	unsigned char    rgbRed;
-	unsigned char    rgbReserved;
-}	RGBQUAD;
+	t_bmp_file_header	bfh;
+	int32_t			*ptr;
 
- void	save_in_bmp(t_img *img)
-{
-	puts("saving in bmp...(no)");
-	exit(0) ;
-
+	bfh.type = 0x4D42;
+	ptr = (int32_t *)&bfh.size1;
+	*ptr = (sizeof(t_bmp_file_header) + sizeof(t_bmp_info_header) + g_map->img2->width * g_map->img2->height * 4);
+	bfh.reserved1 = 0;
+	bfh.reserved2 = 0;
+	bfh.off_bits1 = sizeof(t_bmp_file_header) + sizeof(t_bmp_info_header);
+	return (bfh);
 }
 
-int	_main()
+t_bmp_info_header	get_bih()
 {
-	bmp_file_header	bfh;
-	bmp_info_header	bih;
-	int				width;
-	int				height;
+	t_bmp_info_header	bih;
 	
-	width = 100;
-	height = 60;
-	ft_memset(&bfh, 0, sizeof(bfh));
-	bfh.bfType = 0x4d42;
-	bfh.bfOffBits =  sizeof(bmp_file_header) + sizeof(bmp_info_header);
-	bfh.bfSize = sizeof(bmp_file_header) + sizeof(bmp_info_header) + 32 * width * height;
-	ft_memset(&bih, 0, sizeof(bfh));
-	bih.biSize = sizeof(bmp_info_header);//sizeof
-	bih.biWidth = width;
-	bih.biHeight = height;
-	bih.biPlanes = 1;
-	bih.biBitCount = 32;
-//	bih.biCompression = ;
-//	bih.biSizeImage;//0
-//	bih.biXPelsPerMeter
-//	bih.biYPelsPerMeter
-//	bih.biClrUsed;//0
-//	bih.biClrImportant;
-	
-	FILE *fp = fopen("test1.bmp", "r");
-//	fprintf(fp, "%hd%u%hd%hd%u", bfh.bfType, bfh.bfSize, bfh.bfReserved1, bfh.bfReserved2, bfh.bfOffBits);
-//	fprintf(fp, "%u%d%d%hd%hd%u%u%d%d%u%u", bih.biSize, bih.biWidth, bih.biHeight, bih.biPlanes, bih.biBitCount, bih.biCompression, bih.biSizeImage, bih.biXPelsPerMeter, bih.biYPelsPerMeter, bih.biClrUsed, bih.biClrImportant);
-	printf("%hd%u%hd%hd%u", bfh.bfType, bfh.bfSize, bfh.bfReserved1, bfh.bfReserved2, bfh.bfOffBits);
-	printf("%u%d%d%hd%hd%u%u%d%d%u%u", bih.biSize, bih.biWidth, bih.biHeight, bih.biPlanes, bih.biBitCount, bih.biCompression, bih.biSizeImage, bih.biXPelsPerMeter, bih.biYPelsPerMeter, bih.biClrUsed, bih.biClrImportant);
+	bih.size = sizeof(bih);
+	bih.width = g_map->img2->width;
+	bih.height = -g_map->img2->height;
+	bih.planes = 1;
+	bih.bit_count = g_map->img2->bits_per_pixel;;
+	bih.compression = 0;
+	bih.size_image = 0;
+	bih.x_pels_per_meter = 0;
+	bih.y_pels_per_meter = 0;
+	bih.clr_used = 0;
+	bih.clr_important = 0;
+	return (bih);
 }
+
+void	save_in_bmp(t_img *img)
+{
+	puts("saving bmp...");
+	t_bmp_file_header	bfh;
+	t_bmp_info_header	bih;
+	
+	bfh = get_bfh();
+	bih = get_bih();
+
+	int fd = open("screenshot.bmp", O_CREAT | O_WRONLY | O_TRUNC, S_IRWXU);
+	write(fd, (void *)&bfh, sizeof(bfh));
+	write(fd, (void *)&bih, sizeof(bih));
+	write(fd, (void *)img->addr, img->width * img->height * 4);
+	mlx_destroy_image(g_mlx_ptr, img->ptr);
+	exit(0);
+}
+//# pragma pack()
