@@ -2,18 +2,15 @@ R 1500 1000
 WE ./textures/foliage_green.xpm
 SO ./textures/ice.xpm 
 NO ./textures/bookshelf.xpm
-EA ./textures/hay.xpm
-
-S ./path_to_the_sprite_texture
+EA ./textures/ice.xpm
+S ./textures/seal.xpm
 C 140, 195, 207
 F 204, 192, 184
 
-111111111
-101010101
-101010001
-101000001
-100000001
-100200001
-100000001
-1100N0001
-111111111
+111111111111
+100000000011
+100000000001
+100000000021
+1000000000N1
+100000000021
+111111111111

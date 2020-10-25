@@ -6,7 +6,7 @@
 /*   By: miphigen <miphigen@student.21-school.ru>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/12 10:11:05 by miphigen          #+#    #+#             */
-/*   Updated: 2020/10/25 13:52:54 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/10/25 20:43:16 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,13 +14,27 @@
 
 static int dbg = 0;
 
-char	check_intersect(double x, double y, int scale)
+typedef struct {
+	double x;
+	double y;
+	char type;
+} inter_info_t;
+
+// Based on the left top coord of square, find it's center - sprite coord.
+inter_info_t adjust_sprite_coord(inter_info_t info) {
+	info.x = info.x + g_map->scale / 2;
+	info.y = info.y + g_map->scale / 2;
+	return info;
+}
+
+inter_info_t	check_intersect(double x, double y, int scale)
 {
 	char	c;
 	double	y1;
 	double	x1;
 	int		y_coord;
 	int		x_coord;
+	inter_info_t info = {-1, -1, 0};
 
 	x = x + 0.5;
 	y = y + 0.5;
@@ -28,27 +42,44 @@ char	check_intersect(double x, double y, int scale)
 	x1 = x - 2 * 0.5;
 	if (y >= g_map->maze_height * scale || x >= g_map->maze_width * scale)
 	{
+	//	printf("%f (%d) %f (%d)\n", x , g_map->maze_width * scale,y, g_map->maze_height * scale);
 		y >= g_map->img2->height - 1 ? y = g_map->img2->height : 0; 
 		x >= g_map->img2->width - 1 ? x = g_map->img2->width : 0;
-		return ('1');
+		info.type = '1';
+		return info;
 	}
-	else if (y1 < 0 || x1 < 0)
-		return ('1');
+	else if (y1 < 0 || x1 < 0) {
+		info.type = '1';
+		return info;
+	}
 	y_coord = (int)floor(y / scale);
 	x_coord = (int)floor(x / scale);
 	c = g_map->maze[y_coord][x_coord];
-	if (c == '1' || c == ' ')
-		return ('1');
-	if (c == '2')
-		return '2';
+	if (c == '1' || c == ' ') {
+		info.type = '1';
+		return info;
+	}
+	if (c == '2') {
+		info.x = x_coord * scale;
+		info.y = y_coord * scale;
+		info.type = '2';
+		return info;
+	}
 	y_coord = (int)floor(y1 / scale);
 	x_coord = (int)floor(x1 / scale);
 	c = g_map->maze[y_coord][x_coord];
-	if (c == '1' || c == ' ')
-		return ('1');
-	if (c == '2')
-		return '2';
-	return (c);
+	if (c == '1' || c == ' ') {
+		info.type = '1';
+		return info;
+	}
+	if (c == '2') {
+		info.x = x_coord * scale;
+		info.y = y_coord * scale;
+		info.type = '2';
+		return info;
+	}
+	info.type = c;
+	return (info);
 }
 
 void	vertical_cross(t_wall *wall, double angle)
@@ -67,18 +98,38 @@ void	vertical_cross(t_wall *wall, double angle)
 	}
 	else
 		x = floor(g_map->hero_x / step) * step;
-	tg = tan(angle - M_PI / 2);
-	y = (x / tg) + g_map->hero_y - (g_map->hero_x / tg);
-	step_y = step / tg;
+	tg = tan(M_PI - angle);
+	double c = g_map->hero_y - (g_map->hero_x * tg);
+	y = (x * tg) + c;
+	step_y = step * tg;
 	if (dbg) printf("@vertical_cross: initial x = %f, y = %f, step_y = %f, step_x = %f\n", x, y, step_y, step);
 	while (x < g_map->img2->width)
 	{
 		x += step;
 		y += step_y;
-		wall->number = check_intersect(x, y, g_map->scale);
+		inter_info_t info = check_intersect(x, y, g_map->scale);
+		wall->number = info.type;
 		if (wall->number == '1')
 			break ;
-		if (wall->number == '2')
+		if (wall->number == '2' && wall->next->x < 0) {
+			info = adjust_sprite_coord(info);
+			//printf("sprite center: (%f, %f)\n", info.x, info.y);
+			// y = -1/tg * x + cs
+			double cs = info.y + info.x / tg;
+			// (x0, y0) - intersection of ray and sprite
+			double x0 = tg * (cs - c) / (tg * tg + 1);
+			double y0 = (tg * tg * cs + c) / (tg * tg + 1);
+			double d = sqrt((x0 - info.x) * (x0 - info.x) + (y0 - info.y) * (y0 - info.y));
+			double sprite_width = g_map->scale / 2;
+			if (d * 2 <= sprite_width) {
+				wall->next->x = x0;
+				wall->next->y = y0;
+				wall->next->xs = info.x;
+				wall->next->ys = info.y;
+				wall->next->dist = sqrt(pow(x0 - g_map->hero_x, 2) + pow(y0 - g_map->hero_y, 2));
+				//printf("@@@@ sprite center: (%f, %f), sprite intersect: (%f, %f), d: %f\n", info.x, info.y,x0,y0,d);
+			}
+		}
 		;//	add_item(x, y, angle, 0);
 	}
 	wall->x = x;
@@ -109,17 +160,37 @@ void	horizontal_cross(t_wall *wall, double angle)
 		step *= -1;
 	}
 	tg = tan(M_PI - angle);
-	x = (y / tg) + g_map->hero_x - (g_map->hero_y / tg);
+	double c = g_map->hero_y - (g_map->hero_x * tg);
+	x = (y / tg) - c / tg;//g_map->hero_x - (g_map->hero_y / tg);
 	step_x = step / tg;
 	if (dbg) printf("@horizontal_cross: initial x = %f, y = %f, step = %f, step_x = %f\n", x, y, step, step_x);
 	while (y < g_map->img2->height)
 	{
 		y += step;
 		x += step_x;
-		wall->number = check_intersect(x, y, g_map->scale);
+		inter_info_t info = check_intersect(x, y, g_map->scale);
+		wall->number = info.type;
 		if (wall->number == '1')
 			break ;
-		if (wall->number == '2')
+		if (wall->number == '2' && wall->next->x < 0) {
+			info = adjust_sprite_coord(info);
+			printf("sprite center: (%f, %f)\n", info.x, info.y);
+			// y = -1/tg * x + cs
+			double cs = info.y + info.x / tg;
+			// (x0, y0) - intersection of ray and sprite
+			double x0 = tg * (cs - c) / (tg * tg + 1);
+			double y0 = (tg * tg * cs + c) / (tg * tg + 1);
+			double d = sqrt((x0 - info.x) * (x0 - info.x) + (y0 - info.y) * (y0 - info.y));
+			double sprite_width = g_map->scale / 2;
+			if (d * 2 <= sprite_width) {
+				wall->next->x = x0;
+				wall->next->y = y0;
+				wall->next->xs = info.x;
+				wall->next->ys = info.y;
+				wall->next->dist = sqrt(pow(x0 - g_map->hero_x, 2) + pow(y0 - g_map->hero_y, 2));
+				//printf("@@@@ sprite center: (%f, %f), sprite intersect: (%f, %f), d: %f\n", info.x, info.y,x0,y0,d);
+			}
+		}
 			;//add_item(x, y, angle, 0);
 	}
 	dist = sqrt(pow(x - g_map->hero_x, 2) + pow(y - g_map->hero_y, 2));
@@ -176,6 +247,10 @@ double	calculate_height(t_wall *wall, double angle)
 void	draw_section(int x0, int x1, double angle)
 {
 	t_wall	wall;
+	t_sprite	sprite;
+
+	sprite.x = -1;
+	wall.next = &sprite;
 
 	g_map->status = 15;
 	get_wall_inf(angle, &wall);
@@ -184,6 +259,7 @@ void	draw_section(int x0, int x1, double angle)
 	{
 		paint_ceil_floor(x0, g_map->img2->height / 2, wall.height / 2 + 1);
 		apply_texture(x0, x1, &wall);
+		
 		x0++;
 	}
 	if (dbg)

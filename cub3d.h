@@ -6,7 +6,7 @@
 /*   By: miphigen <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/16 00:30:20 by miphigen          #+#    #+#             */
-/*   Updated: 2020/10/25 13:47:51 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/10/25 19:49:18 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,23 @@
 # define ROTATION_SPEED M_PI / 90 
 # define PPR 1 //не менять
 
+typedef struct	s_sprite
+{
+	double		dist;
+	char		type;
+	double		x;
+	double		y;
+
+	double		height;
+	double		actual_height;
+	t_img		*texture_ptr;
+	char		number;
+
+	// center of the sprite
+	double		xs;
+	double		ys;
+}				t_sprite;
+
 typedef struct	s_wall
 {
 	double		dist;
@@ -38,7 +55,7 @@ typedef struct	s_wall
 	double		actual_height;
 	t_img		*texture_ptr;
 	char		number;
-	struct		s_wall *next;
+	t_sprite	*next;
 }				t_wall;
 
 typedef struct	s_item
