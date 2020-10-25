@@ -7,6 +7,8 @@ l:
 	gcc *c3.c ~/libft.a mlx.a -lXext -lX11 -lm -g && ./a.out map.cub
 lg:
 	gcc *c3.c ~/libft.a mlx.a -lXext -lX11 -lm -g && gdb ./a.out map.cub
+b:
+	gcc *c3.c ~/libft.a mlx.a -lXext -lX11 -lm -g && ./a.out map.cub map.cub --save
 c:
 	gcc *c3.c ~/libft.a mlx.a -lXext -lX11 -lm -g
 test:

@@ -6,13 +6,13 @@
 /*   By: miphigen <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/13 16:18:03 by miphigen          #+#    #+#             */
-/*   Updated: 2020/10/14 15:22:46 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/10/21 20:02:22 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-int		g_map_config_is_complete()
+int		g_map_config_is_complete(void)
 {
 	if (g_map->res_width == -1 || g_map->res_height == -1)
 		set_error_and_exit("Missing resolution configuration");
@@ -69,7 +69,8 @@ void	parse_texture_addr(char *line)
 		g_map->path_S = line;
 	else
 	{
-		set_error_and_exit("Invalid identifier name or repeated texture configuration");
+		set_error_and_exit("Invalid identifier name or \
+		repeated texture configuration");
 		free(line);
 	}
 }
@@ -92,7 +93,8 @@ void	parse_rgb(char *line)
 	else if (*id == 'C' && ft_is_in_set(" \t", *++id) == 1 && g_map->ceil == -1)
 		g_map->ceil = (r << 16 | g << 8 | b);
 	else
-		set_error_and_exit("Invalid color value or repeated color configuration");
+		set_error_and_exit("Invalid color value or \
+		repeated color configuration");
 }
 
 void	parse_line(char *line, int fd)
@@ -113,24 +115,9 @@ void	parse_line(char *line, int fd)
 		parse_rgb(line);
 	else if (*line == '1')
 	{
-		if ((g_map->status = g_map_config_is_complete(g_map)) == 1)
+		if ((g_map->status = g_map_config_is_complete()) == 1)
 			parse_maze(fd, ft_strdup(ptr));
 	}
 	else
 		set_error_and_exit("Invalid character in g_map configuration");
-}
-
-void	parse_map(int fd)
-{
-	char		*line;
-	int			ret_value;
-
-	g_map->status = 1;
-	while ((ret_value = get_next_line(fd, &line)) > 0 && g_map->msg == NULL)
-	{
-		parse_line(line, fd);
-		free(line);
-	}
-	if (ret_value == -1)
-		set_error_and_exit("Error occurred while reading or opening file");
 }
