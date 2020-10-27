@@ -6,7 +6,7 @@
 /*   By: miphigen <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/16 00:30:20 by miphigen          #+#    #+#             */
-/*   Updated: 2020/10/25 19:49:18 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/10/26 19:33:53 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,9 @@ typedef struct	s_sprite
 	// center of the sprite
 	double		xs;
 	double		ys;
+
+	// distance from the left side of the sprite
+	double		d;
 }				t_sprite;
 
 typedef struct	s_wall
@@ -100,9 +103,6 @@ typedef struct	s_map_info
 	t_img		*EA;
 	t_img		*S;
 	t_img		*texture_ptr;
-	t_img		*previous_texture_ptr;
-	int			column_counter;
-	int			column_number;
 
 
 	t_item		*items;

@@ -6,7 +6,7 @@
 /*   By: miphigen <miphigen@student.21-school.ru>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/11 19:17:14 by miphigen          #+#    #+#             */
-/*   Updated: 2020/10/25 17:18:03 by miphigen         ###   ########.fr       */
+/*   Updated: 2020/10/26 21:15:45 by miphigen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,22 +37,28 @@ void	dl_textures()
 
 double		get_column_number(t_wall *wall)
 {
-	double i =  wall->y / g_map->scale;
-	while (i > 1)
-		i -= 1.;
+	double i = wall->y / g_map->scale;
+	i = i - floor(i);
 	i = i * wall->texture_ptr->width;
 	
-	double j =  wall->x / g_map->scale;
-	while (j > 1)
-		j -= 1.;
+	double j = wall->x / g_map->scale;
+	j = j - floor(j);
 	j = j * wall->texture_ptr->width;
 	
 	return (wall->type == 'S' || wall->type == 'N' ? j : i);
 }
 
+double		get_sprite_column_number(t_sprite *wall)
+{
+	double d = wall->d;
+	const int width_coef = 2;
+	double sprite_width = g_map->scale / width_coef;
+    d = d / sprite_width * wall->texture_ptr->width;
+	return d;
+}
+
 void	apply_texture(int x, int delete_later, t_wall *wall)
 {
-	double			scale_y;
 	int				y_start;
 	int				y_end;
 	int				yy;
@@ -66,25 +72,36 @@ void	apply_texture(int x, int delete_later, t_wall *wall)
 		wall->texture_ptr = g_map->EA;
 	else
 		wall->texture_ptr = g_map->S;
-	if (wall->texture_ptr != g_map->previous_texture_ptr)
-	g_map->column_number = 0;
-	g_map->column_number = (int)floor(get_column_number(wall));
+	int column_number = (int)floor(get_column_number(wall));
 	y_start = (g_map->img2->height - wall->height) / 2;
 	y_end = y_start + wall->height;
-	scale_y = floor(wall->height / wall->texture_ptr->height);
 	int i = -1;
 	while (++i < wall->height)
 	{
-		int xx = g_map->column_number * wall->texture_ptr->bits_per_pixel / 8;
+		int xx = column_number * wall->texture_ptr->bits_per_pixel / 8;
 			yy = floor((double)(i + (wall->actual_height - wall->height)/2) / wall->actual_height * wall->texture_ptr->height) * wall->texture_ptr->size_line;//
 		void *ptr = wall->texture_ptr->addr + xx + yy;
 		if (*(unsigned int*)ptr != 0)
 			img_pixel_put(g_map->img2, x, i + y_start, *(unsigned int*)ptr);
+//		printf("xx: %d, yy: %d, i: %d, y_start: %d, *ptr = %x\n", xx,yy,i,y_start,*(unsigned int*)ptr);
 	}
-	g_map->previous_texture_ptr = wall->texture_ptr;
-	if (++g_map->column_counter >= scale_y)
-	{	
-		g_map->column_number++;
-		g_map->column_counter = 0;
+
+	if (wall->next->x >= 0) {
+		// sprite
+		t_img* texture_ptr = g_map->S;
+		wall->next->texture_ptr = texture_ptr;
+		y_start = (g_map->img2->height - wall->next->height) / 2;
+
+		i = -1;
+		column_number = (int)floor(get_sprite_column_number(wall->next));
+		//printf("%d\n", column_number);
+		while (++i < wall->next->height)
+		{
+			int xx = column_number * texture_ptr->bits_per_pixel / 8;
+				yy = floor((double)(i + (wall->next->actual_height - wall->next->height)/2) / wall->next->actual_height * texture_ptr->height) * texture_ptr->size_line;//
+			void *ptr = texture_ptr->addr + xx + yy;
+			if (*(unsigned int*)ptr != 0)
+				img_pixel_put(g_map->img2, x, i + y_start, *(unsigned int*)ptr);
+		}
 	}
 }
